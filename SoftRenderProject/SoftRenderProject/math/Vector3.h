@@ -30,8 +30,7 @@ public:
 	Vector3 operator + (const Vector3& right) const;
 	Vector3 operator - (const Vector3& right) const;
 	Vector3 operator * (float value) const;
-	Vector3 operator / (float value) const;
-	Vector3 operator * (const Matrix4x4 &m);
+	Vector3 operator / (float value) const;	
 
 	float SquareMagnitude();
 	float Magnitude();

@@ -56,22 +56,12 @@ Vector3 Vector3::Cross(const Vector3& left, const Vector3& right)
 	float valueX = left.y * right.z - left.z * right.y;
 	float valueY = left.z * right.x - left.x * right.z;
 	float valueZ = left.x * right.y - left.y * right.x;	
-	return Vector3(valueX, valueY, valueZ);;
+	return Vector3(valueX, valueY, valueZ);
 }
 
 Vector3 Vector3::Lerp(const Vector3& from, const Vector3& to, float t)
 {
 	return to * t + from * (1 - t);
-}
-
-Vector3 Vector3::operator * (const Matrix4x4& right)
-{
-	Vector3 ret;
-	ret.x = x * right[0] + y * right[4] + z * right[8] + w * right[12];
-	ret.y = x * right[1] + y * right[5] + z * right[9] + w * right[13];
-	ret.z = x * right[2] + y * right[6] + z * right[10] + w * right[14];
-	ret.w = x * right[3] + y * right[7] + z * right[11] + w * right[15];
-	return ret;
 }
 
 void Vector3::Print()

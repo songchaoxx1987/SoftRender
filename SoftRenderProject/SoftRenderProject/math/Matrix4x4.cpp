@@ -52,6 +52,16 @@ Matrix4x4 Matrix4x4::operator * (float k) const
 	return m;
 }
 
+Vector3 Matrix4x4::mul(const Vector3& v) const
+{
+	Vector3 ret;
+	ret.x = value[0] * v.x + value[1] * v.y + value[2] * v.z + value[3] * v.w ;
+	ret.y = value[4] * v.x + value[5] * v.y + value[6] * v.z + value[7] * v.w;
+	ret.z = value[8] * v.x + value[9] * v.y + value[10] * v.z + value[11] * v.w;
+	ret.w = value[12] * v.x + value[13] * v.y + value[14] * v.z + value[15] * v.w;
+	return ret;
+}
+
 void Matrix4x4::Identity()
 {
 	for (int i = 0; i < 4; i++)
