@@ -18,14 +18,6 @@ public:
 		w = 1;
 	}
 
-	Vector3(float r, float g, float b, float a)
-	{
-		x = r;
-		y = g;
-		z = b;
-		w = a;
-	}
-
 
 	Vector3 operator + (const Vector3& right) const;
 	Vector3 operator - (const Vector3& right) const;
@@ -35,8 +27,7 @@ public:
 	float SquareMagnitude();
 	float Magnitude();
 	void Normalize();
-	Vector3 static MulAsColor(const Vector3 &left, const Vector3 &right);
-
+	
 	float static Dot(const Vector3& left, const Vector3& right);
 	Vector3 static Cross(const Vector3& left, const Vector3& right);
 	Vector3 static Lerp(const Vector3& left, const Vector3& right, float t);

@@ -13,8 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="math">
-      <UniqueIdentifier>{3cf81865-a673-4a90-8e7f-9fe3eda189b1}</UniqueIdentifier>
+    <Filter Include="game3D">
+      <UniqueIdentifier>{370d38f0-bcbc-4ff1-8b09-d92975e50256}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{22da423f-5d95-4ad5-9d7e-1660ce069d52}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -30,11 +33,23 @@
     <ClInclude Include="SoftRenderProject.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="math\Matrix4x4.h">
-      <Filter>math</Filter>
+    <ClInclude Include="Vector3.h">
+      <Filter>game3D</Filter>
     </ClInclude>
-    <ClInclude Include="math\Vector3.h">
-      <Filter>math</Filter>
+    <ClInclude Include="Vertex.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
+    <ClInclude Include="CMesh.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
+    <ClInclude Include="define.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector2.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Color.h">
+      <Filter>game3D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -54,11 +69,23 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="math\Matrix4x4.cpp">
-      <Filter>math</Filter>
+    <ClCompile Include="Vector3.cpp">
+      <Filter>game3D</Filter>
     </ClCompile>
-    <ClCompile Include="math\Vector3.cpp">
-      <Filter>math</Filter>
+    <ClCompile Include="Vertex.cpp">
+      <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="CMesh.cpp">
+      <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Color.cpp">
+      <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector2.cpp">
+      <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Util.cpp">
+      <Filter>Util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -43,7 +43,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -147,17 +147,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CMesh.h" />
+    <ClInclude Include="Color.h" />
+    <ClInclude Include="define.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="math\Matrix4x4.h" />
-    <ClInclude Include="math\Vector3.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SoftRenderProject.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Vector2.h" />
+    <ClInclude Include="Vector3.h" />
+    <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CMesh.cpp" />
+    <ClCompile Include="Color.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="math\Matrix4x4.cpp" />
-    <ClCompile Include="math\Vector3.cpp" />
+    <ClCompile Include="Util.cpp" />
+    <ClCompile Include="Vector2.cpp" />
+    <ClCompile Include="Vector3.cpp" />
+    <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SoftRenderProject.rc" />

@@ -1,4 +1,4 @@
-#include "../framework.h"
+#include "framework.h"
 #include "Vector3.h"
 #include "math.h"
 #include "stdio.h"
@@ -67,9 +67,4 @@ Vector3 Vector3::Lerp(const Vector3& from, const Vector3& to, float t)
 void Vector3::Print()
 {
 	printf("(%f,%f,%f,%f)\n", x, y, z, w);
-}
-
-Vector3 Vector3::MulAsColor(const Vector3 &left, const Vector3 &right)
-{
-	return Vector3(left.x * right.x, left.y * right.y, left.z * right.z, left.w * right.w);
 }

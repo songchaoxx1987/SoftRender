@@ -3,7 +3,11 @@
 
 #include "framework.h"
 #include "SoftRenderProject.h"
+#include "stdio.h"
+#include "CMesh.h"
 
+
+#define APPDIR_LEN 256
 #define MAX_LOADSTRING 100
 
 // 全局变量:
@@ -16,6 +20,7 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+char* appRootDir = new char[APPDIR_LEN];
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -37,6 +42,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     {
         return FALSE;
     }
+
+    ::GetCurrentDirectory(APPDIR_LEN, appRootDir);
+
+    AllocConsole();
+    FILE* stream;
+    freopen_s(&stream, "CON", "r", stdin);
+    freopen_s(&stream, "CON", "w", stdout);
+
+    char buffer[512];
+    sprintf_s(buffer, "%s\\..\\..\\res\\mesh\\Cube.obj", appRootDir);
+    CMesh mesh;    
+    mesh.LoadFromFile(buffer);
+
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SOFTRENDERPROJECT));
 
