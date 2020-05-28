@@ -51,6 +51,15 @@
     <ClInclude Include="Color.h">
       <Filter>game3D</Filter>
     </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix4x4.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SoftRenderProject.rc">
@@ -86,6 +95,15 @@
     </ClCompile>
     <ClCompile Include="Util.cpp">
       <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix4x4.cpp">
+      <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>game3D</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,9 +1,14 @@
-#include "../framework.h"
+#include "framework.h"
 #include "Matrix4x4.h"
 #include "Vector3.h"
 #include "math.h"
 #include "stdio.h"
 
+Matrix4x4::Matrix4x4()
+{
+	memset(value, 0, 16 * sizeof(float));
+	Identity();
+}
 
 Matrix4x4 Matrix4x4::operator + (const Matrix4x4& right) const
 {
@@ -98,6 +103,11 @@ void Matrix4x4::Print()
 		if ((i + 1) % 4 == 0)
 			printf("\n");
 	}
+}
+
+float& Matrix4x4::operator[](const int idx)
+{
+	return value[idx];
 }
 
 float Matrix4x4::operator[](const int idx) const

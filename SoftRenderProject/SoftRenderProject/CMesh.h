@@ -5,7 +5,13 @@ class Vertex;
 class CMesh
 {
 public:
-	Vertex* pVextexs = NULL;
+	~CMesh()
+	{
+		Release();
+	}
+
+	Vertex* m_pVextexs = NULL;
+	int m_vextexCnt;
 
 	void LoadFromFile(const char* file);
 	void Release();

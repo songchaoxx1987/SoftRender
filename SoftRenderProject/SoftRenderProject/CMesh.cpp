@@ -38,7 +38,7 @@ void CMesh::LoadFromFile(const char* file)
 			pos.y = atof(temp[2].c_str());
 			pos.z = atof(temp[3].c_str());
 			positions.push_back(pos);
-			pos.Print();
+			//pos.Print();
 		}
 		else if(key=="vn")
 		{
@@ -47,7 +47,7 @@ void CMesh::LoadFromFile(const char* file)
 			n.y = atof(temp[2].c_str());
 			n.z = atof(temp[3].c_str());
 			normals.push_back(n);
-			n.Print();
+			//n.Print();
 		}
 		else if(key=="vt")
 		{
@@ -55,7 +55,7 @@ void CMesh::LoadFromFile(const char* file)
 			uv.x = atof(temp[1].c_str());
 			uv.y = atof(temp[2].c_str());
 			uvs.push_back(uv);
-			uv.Print();
+			//uv.Print();
 		}
 		else if (key=="f")
 		{
@@ -69,23 +69,25 @@ void CMesh::LoadFromFile(const char* file)
 				normalIdx.push_back(atoi(v[2].c_str()));
 
 				int idx = posIdx.size() - 1;
-				printf("%d %d %d\n", posIdx[idx], uvIdx[idx], normalIdx[idx]);
+				//printf("%d %d %d\n", posIdx[idx], uvIdx[idx], normalIdx[idx]);
 			}
 			
 		}
 	}
 	stream.close();	
-	pVextexs = new Vertex[posIdx.size()];
-	for (int i = 0; i < posIdx.size() ; ++i)
+	m_vextexCnt = posIdx.size();
+	m_pVextexs = new Vertex[m_vextexCnt];
+	for (int i = 0; i < m_vextexCnt; ++i)
 	{
-		pVextexs[i].position = positions[posIdx[i] - 1];
-		pVextexs[i].normal = normals[normalIdx[i] - 1];
-		pVextexs[i].uv = uvs[uvIdx[i] - 1];
+		m_pVextexs[i].position = positions[posIdx[i] - 1];
+		m_pVextexs[i].normal = normals[normalIdx[i] - 1];
+		m_pVextexs[i].uv = uvs[uvIdx[i] - 1];
 	}
 
 }
 
 void CMesh::Release()
 {
-	SAFE_DELETE(pVextexs);
+	SAFE_DELETE(m_pVextexs);
+	m_vextexCnt = 0;
 }

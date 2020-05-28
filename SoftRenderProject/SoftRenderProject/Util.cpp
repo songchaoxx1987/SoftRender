@@ -2,8 +2,8 @@
 
 void split(std::string str, std::vector<std::string>& ret, char delim)
 {
-	int begin = 0;
-	int i = 0;
+	size_t begin = 0;
+	size_t i = 0;
 	while (i < str.length())
 	{
 		if (str[i] == delim)

@@ -1,14 +1,12 @@
 #pragma once
+
 class Vector3;
 class Matrix4x4
 {	
 public:
 	float value[16];
-	Matrix4x4()
-	{		
-		memset(value, 0, 16*sizeof(float));	
-	}
-
+	Matrix4x4();	
+	float& operator [] (const int idx);
 	float operator [] (const int idx) const;
 	Matrix4x4 operator + (const Matrix4x4& right) const;
 	Matrix4x4 operator - (const Matrix4x4& right) const;

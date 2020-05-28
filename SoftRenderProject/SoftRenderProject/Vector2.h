@@ -1,6 +1,5 @@
 #pragma once
 
-class Matrix4x4;
 class Vector2
 {
 public:
