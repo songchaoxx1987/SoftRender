@@ -15,20 +15,23 @@ public:
 	Camera();
 	~Camera();
 
-	Vector3 position;
-	Vector3 lookAt;
+	Vector3 m_position;
+	Vector3 m_lookAt;
 
-	float nearPanel;
-	float farPanel;
+	void SetOrthoCameraInfo(float size, float aspect, float near, float far);
+	void SetPerspectiveCameraInfo(float fov, float aspect, float near, float far);
+
+private:
+	float _nearPlane;
+	float _farPlane;
 	// Perspective
-	float fov;
-	float aspect;	
-	// Orthographic
-	float size;
-	float left;
-	float right;
-	float top;
-	float bottom;
+	float _fov;
+	float _aspect;	
+	// Orthographic	
+	float _left;
+	float _right;
+	float _top;
+	float _bottom;
 
 	CAMERA_PROJECTION_MODE mode;
 
