@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CDevice.h" />
     <ClInclude Include="CMesh.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="define.h" />
@@ -163,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CDevice.cpp" />
     <ClCompile Include="CMesh.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="main.cpp" />

@@ -5,7 +5,7 @@
 #include "SoftRenderProject.h"
 #include "stdio.h"
 #include "CMesh.h"
-
+#include "CDevice.h"
 
 #define APPDIR_LEN 256
 #define MAX_LOADSTRING 100
@@ -21,6 +21,8 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 char* appRootDir = new char[APPDIR_LEN];
+
+CDevice* pDevice = NULL;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -57,6 +59,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SOFTRENDERPROJECT));
+        
+    pDevice->Clear(RGB(0, 120, 180));
+    
+    for (int x = 50; x < 200; ++x)
+    {
+        for (int y = 50; y < 200; ++y)
+            pDevice->DrawPiexl(x, y, RGB(255, 0, 0));
+    }
+
+    pDevice->ApplyToScreen();
 
     MSG msg;
 
@@ -126,6 +138,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
+   RECT ClientRt;
+   GetClientRect(hWnd, &ClientRt);   
+   pDevice = new CDevice();
+   pDevice->Init(hWnd, ClientRt.right - ClientRt.left, ClientRt.bottom - ClientRt.top);
    return TRUE;
 }
 

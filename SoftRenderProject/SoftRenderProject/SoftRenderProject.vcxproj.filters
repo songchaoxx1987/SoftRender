@@ -60,6 +60,9 @@
     <ClInclude Include="Camera.h">
       <Filter>game3D</Filter>
     </ClInclude>
+    <ClInclude Include="CDevice.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SoftRenderProject.rc">
@@ -103,6 +106,9 @@
       <Filter>game3D</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
+      <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="CDevice.cpp">
       <Filter>game3D</Filter>
     </ClCompile>
   </ItemGroup>
