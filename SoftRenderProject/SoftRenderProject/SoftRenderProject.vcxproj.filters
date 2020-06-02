@@ -63,6 +63,21 @@
     <ClInclude Include="CDevice.h">
       <Filter>game3D</Filter>
     </ClInclude>
+    <ClInclude Include="RenderObject.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPipeline.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Trangle.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SoftRenderProject.rc">
@@ -110,6 +125,21 @@
     </ClCompile>
     <ClCompile Include="CDevice.cpp">
       <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderObject.cpp">
+      <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPipeline.cpp">
+      <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Trangle.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

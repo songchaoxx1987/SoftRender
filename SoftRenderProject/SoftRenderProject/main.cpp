@@ -6,6 +6,7 @@
 #include "stdio.h"
 #include "CMesh.h"
 #include "CDevice.h"
+#include "Color.h"
 
 #define APPDIR_LEN 256
 #define MAX_LOADSTRING 100
@@ -60,12 +61,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SOFTRENDERPROJECT));
         
-    pDevice->Clear(RGB(0, 120, 180));
-    
+    pDevice->Clear(Color::ToRGB(0,0.47f,0.5f));    
     for (int x = 0; x < 200; ++x)
     {
-        for (int y = 0; y <500; ++y)
-            pDevice->DrawPiexl(x, y, RGB(255, 0, 0));
+        for (int y = 0; y <255; ++y)
+            pDevice->DrawPiexl(x, y, Color::ToRGB(y/255.0f, 0, 0));
     }
 
     pDevice->ApplyToScreen();

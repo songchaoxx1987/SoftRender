@@ -1,5 +1,5 @@
 #include "CDevice.h"
-
+#include "Trangle.h"
 
 void CDevice::Init(HWND hWnd, int screenW, int screenH)
 {
@@ -32,7 +32,7 @@ void CDevice::Init(HWND hWnd, int screenW, int screenH)
 
 }
 
-void CDevice::DrawPiexl(int x, int y, COLORREF color)
+void CDevice::DrawPiexl(int x, int y, UINT32 color)
 {
 	if (x < 0 ||
 		x > screenWidth ||
@@ -44,12 +44,21 @@ void CDevice::DrawPiexl(int x, int y, COLORREF color)
 	
 }
 
-void CDevice::Clear(COLORREF color)
-{
-	for (int x = 0; x < screenWidth; ++x)
+void CDevice::Clear(UINT32 color)
+{	
+	auto len = screenWidth * sizeof(UINT32);
+	for (int x = 0; x < screenHeight; ++x)
 	{
-		for (int y = 0; y < screenHeight; ++y)
-			DrawPiexl(x, y,color);
+		memset(frameBuffer[x], color, len );		
+	}
+}
+
+void CDevice::ClearZBuffer()
+{
+	auto len = screenWidth * sizeof(float);
+	for (int x = 0; x < screenHeight; ++x)
+	{
+		memset(frameBuffer[x], 0, len);
 	}
 }
 
@@ -59,3 +68,6 @@ void CDevice::ApplyToScreen()
 	BitBlt(hDC, 0, 0, screenWidth, screenHeight, hMemDc, 0, 0, SRCCOPY);
 	ReleaseDC(hMainWnd, hDC);
 }
+
+void CDevice::RasterizeTrangle(Trangle* pTrangle, Material* pMat)
+{}

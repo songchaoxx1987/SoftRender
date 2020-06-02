@@ -1,4 +1,5 @@
 #pragma once
+#include "define.h"
 struct Color
 {
 public:
@@ -31,6 +32,9 @@ public:
 	Color operator * (float value) const;
 	Color operator / (const Color& right) const;
 	Color operator / (float value) const;		
+	UINT32 ToRGB();
+	static UINT32 ToRGB(float fr, float fg, float fb);
+	
 
 };
 

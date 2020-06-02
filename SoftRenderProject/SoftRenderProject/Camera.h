@@ -20,7 +20,8 @@ public:
 
 	void SetOrthoCameraInfo(float size, float aspect, float near, float far);
 	void SetPerspectiveCameraInfo(float fov, float aspect, float near, float far);
-
+	Matrix4x4 GetMatrix_Proj();
+	Matrix4x4 GetMatrix_View();
 private:
 	float _nearPlane;
 	float _farPlane;
@@ -35,9 +36,6 @@ private:
 
 	CAMERA_PROJECTION_MODE mode;
 
-	Matrix4x4 GetMatrix_Proj();
-	Matrix4x4 GetMatrix_View();
-private:
 	Matrix4x4 projMatrix;
 	Matrix4x4 viewMatrix;
 
