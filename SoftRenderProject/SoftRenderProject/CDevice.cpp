@@ -21,13 +21,14 @@ void CDevice::Init(HWND hWnd, int screenW, int screenH)
 	unsigned char* fb = (unsigned char*)ptr;
 	memset(fb, 0, screenWidth * screenHeight * 4);
 
+	frameBuffer = new UINT32 * [screenHeight];
 	for (int j = 0; j < screenHeight; j++) {
-		frameBuffer[j] = (unsigned int*)(fb + screenW * 4 * j);		
+		frameBuffer[j] = (UINT32*)(fb + screenWidth * 4 * j);
 	}
 
-	zBuffer = new float* [screenH];
-	for (int i = 0; i < screenH; ++i)
-		zBuffer[i] = new float[screenW];
+	zBuffer = new float* [screenHeight];
+	for (int i = 0; i < screenHeight; ++i)
+		zBuffer[i] = new float[screenWidth];
 
 }
 

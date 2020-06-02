@@ -62,9 +62,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         
     pDevice->Clear(RGB(0, 120, 180));
     
-    for (int x = 50; x < 200; ++x)
+    for (int x = 0; x < 200; ++x)
     {
-        for (int y = 50; y < 200; ++y)
+        for (int y = 0; y <500; ++y)
             pDevice->DrawPiexl(x, y, RGB(255, 0, 0));
     }
 

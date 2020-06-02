@@ -1,5 +1,6 @@
 #pragma once
 #include"framework.h"
+#include"define.h"
 
 class CDevice
 {
@@ -15,7 +16,7 @@ protected:
     int screenWidth;
     int screenHeight;
     float** zBuffer;
-    unsigned int** frameBuffer;
+    UINT32** frameBuffer;
 
     HDC hMemDc = NULL;    
     HBITMAP hBMP;

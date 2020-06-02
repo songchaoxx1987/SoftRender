@@ -11,8 +11,7 @@
 #define AngleToRad(angle) angle * PI/180.0f
 #define lerp(from, to, t)  to * t + (1 - t) * from
 
-
-
+typedef unsigned int UINT32;
 
 template <typename  T>
 T Clamp(T a, T min, T max)
