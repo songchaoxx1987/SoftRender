@@ -1,14 +1,20 @@
 #pragma once
 
+struct  Color;
 class Texture;
 class Material
 {
+public:
 	Material();	
 	Texture* pTexture;
-	float alpha;
+	Color* pColor;
+
 	bool isAlphaBlend;
 	bool isAplhaTest;
 	bool zWrite;
-	int zTestOp;
+	bool zTest;
+	//int cullOp;	// 0 ≤ªºÙ≤√ 1 À≥ ±’Î 2 ƒÊ ±’Î 
+
+	UINT32 GetColor(float u, float v);
 };
 

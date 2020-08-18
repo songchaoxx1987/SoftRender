@@ -3,6 +3,7 @@
 #include "math.h"
 #include "stdio.h"
 #include "Matrix4x4.h"
+#include "Vector2.h"
 
 Vector3 Vector3::operator+(const Vector3& right)const
 {
@@ -62,6 +63,12 @@ Vector3 Vector3::Cross(const Vector3& left, const Vector3& right)
 Vector3 Vector3::Lerp(const Vector3& from, const Vector3& to, float t)
 {
 	return to * t + from * (1 - t);
+}
+
+Vector3::operator Vector2()
+{
+	Vector2 ret(x,y);
+	return ret;
 }
 
 void Vector3::Print()

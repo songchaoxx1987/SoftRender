@@ -2,7 +2,7 @@
 #include "Vector2.h"
 #include "math.h"
 #include "stdio.h"
-
+#include "Vector3.h"
 
 Vector2 Vector2::operator+(const Vector2& right)const
 {
@@ -26,6 +26,11 @@ Vector2 Vector2::operator / (float value) const
 {
 	Vector2 ret(x / value, y / value);
 	return ret;
+}
+
+float Vector2::Cross(const Vector2& left, const Vector2& right)
+{
+	return left.x * right.y - right.x * left.y;	
 }
 
 float Vector2::SquareMagnitude()

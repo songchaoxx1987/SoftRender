@@ -1,6 +1,8 @@
 #pragma once
 
 class Matrix4x4;
+class Vector2;
+
 class Vector3
 {
 public:
@@ -17,7 +19,7 @@ public:
 		z = fz;
 		w = 1;
 	}
-
+	operator Vector2();
 
 	Vector3 operator + (const Vector3& right) const;
 	Vector3 operator - (const Vector3& right) const;

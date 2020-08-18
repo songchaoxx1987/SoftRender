@@ -10,5 +10,7 @@ public:
 	Vector3 normal;
 	Color color;
 	Vector2 uv;
+
+	float rhw;
 };
 

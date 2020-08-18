@@ -56,6 +56,7 @@ void RenderPipeline::Render(RENDER_LIST * pRenderlist, Camera *pCamera, CDevice*
 				//ÊÓ¿ÚÓ³Éä
 				t.v[j].position.x = (t.v[j].position.x + 1) * pDevice->screenWidth * 0.5f;
 				t.v[j].position.y = (1 - t.v[j].position.x) * pDevice->screenHeight * 0.5f;
+				t.v[j].rhw = reciprocalW;
 			}	
 			if (!drop)
 				trangles.push_back(t);			
