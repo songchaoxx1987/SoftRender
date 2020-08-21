@@ -53,20 +53,21 @@ void CDevice::DrawPiexl(int x, int y, UINT32 color)
 }
 
 void CDevice::Clear(UINT32 color)
-{	
-	auto len = screenWidth * sizeof(UINT32);
-	for (int x = 0; x < screenHeight; ++x)
+{		
+	for (int y = 0; y < screenHeight; ++y)
 	{
-		memset(frameBuffer[x], color, len );		
+		for (int x = 0; x < screenWidth; ++x)
+			frameBuffer[y][x] = color;	
 	}
 }
 
 void CDevice::ClearZBuffer()
 {
 	auto len = screenWidth * sizeof(float);
-	for (int x = 0; x < screenHeight; ++x)
+	for (int y = 0; y < screenHeight; ++y)
 	{
-		memset(frameBuffer[x], 0, len);
+		for (int x = 0; x < screenWidth; ++x)
+			zBuffer[y][x] = -1.0f;		
 	}
 }
 
@@ -106,29 +107,26 @@ void CDevice::RasterizeTrangle(Trangle* pTrangle, Material* pMat)
 			float c1 = Vector2::Cross(ab, ap);
 			float c2 = Vector2::Cross(bc, bp);
 			float c3 = Vector2::Cross(ca, cp);
-			if (c1 > 0 && c2 > 0 && c3 > 0)
+			if ((c1 > 0 && c2 > 0 && c3 > 0) || (c1 < 0 && c2 < 0 && c3 < 0))
 			{
 				inside = true;
 				float lamda1 = abs(c1 / areaTrangle2) * pTrangle->v[0].rhw;
 				float lamda2 = abs(c2 / areaTrangle2) * pTrangle->v[1].rhw;
 				float lamda3 = abs(c3 / areaTrangle2) * pTrangle->v[2].rhw;
 
-				float rhw = lamda1 + lamda2 + lamda3;				
+				float rhw = lamda1 + lamda2 + lamda3;		
+				float z = 1.0f / rhw;
 				if (pMat->zTest && zBuffer[x][y] > rhw)
 					continue;
 				if (pMat->zWrite)
 					zBuffer[x][y] = rhw;
-				UINT32 rgb = 0;
-				if (pMat->pTexture != NULL)
-				{
-					Vector2 uv = pTrangle->v[0].uv * lamda1 + pTrangle->v[1].uv * lamda2 + pTrangle->v[2].uv * lamda3;
-					rgb = pMat->GetColor(uv.x, uv.y);
-				}
-				else
-				{
-					Color c = pTrangle->v[0].color * lamda1 + pTrangle->v[1].color * lamda2 + pTrangle->v[2].color * lamda3;
-					rgb = c.ToRGB();
-				}				
+				
+				
+				Vector2 uv = (pTrangle->v[0].uv * lamda1 + pTrangle->v[1].uv * lamda2 + pTrangle->v[2].uv * lamda3);
+				uv = uv * z;
+				//Vector2 uv = (pTrangle->v[0].uv * lamda1 + pTrangle->v[1].uv * lamda2 + pTrangle->v[2].uv * lamda3);
+				UINT32 rgb = pMat->GetColor(uv.x, uv.y);
+					
 				DrawPiexl(x, y, rgb);
 			}
 			else

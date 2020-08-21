@@ -4,17 +4,20 @@
 #include "framework.h"
 #include "SoftRenderProject.h"
 #include "stdio.h"
-#include "CMesh.h"
+//#include "CMesh.h"
 #include "CDevice.h"
 #include "Color.h"
+#include "ResourcesManager.h"
+#include "Scene.h"
+#include "RenderPipeline.h"
 
 #define APPDIR_LEN 256
 #define MAX_LOADSTRING 100
 
 // 全局变量:
 HINSTANCE hInst;                                // 当前实例
-WCHAR szTitle[MAX_LOADSTRING];                  // 标题栏文本
-WCHAR szWindowClass[MAX_LOADSTRING];            // 主窗口类名
+TCHAR szTitle[MAX_LOADSTRING];                  // 标题栏文本
+TCHAR szWindowClass[MAX_LOADSTRING];            // 主窗口类名
 
 // 此代码模块中包含的函数的前向声明:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -36,8 +39,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // TODO: 在此处放置代码。
 
     // 初始化全局字符串
-    LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_SOFTRENDERPROJECT, szWindowClass, MAX_LOADSTRING);
+    LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
+    LoadString(hInstance, IDC_SOFTRENDERPROJECT, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
     // 执行应用程序初始化:
@@ -53,32 +56,66 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     freopen_s(&stream, "CON", "r", stdin);
     freopen_s(&stream, "CON", "w", stdout);
 
+    
     char buffer[512];
-    sprintf_s(buffer, "%s\\..\\..\\res\\mesh\\Cube.obj", appRootDir);
-    CMesh mesh;    
-    mesh.LoadFromFile(buffer);
-
+    sprintf_s(buffer, "%s\\..\\..\\res", appRootDir);   
+    ResourcesManager::Instance()->resRootPath = buffer;
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SOFTRENDERPROJECT));
-        
-    pDevice->Clear(Color::ToRGB(0,0.47f,0.5f));    
+    
+    UINT32 clearColor = Color::ToRGB(0.19,0.3, 0.47f);
+    Scene* pScene = new Scene();
+    pScene->Init();
+
+    RenderPipeline* pPipline = new RenderPipeline();
+
+  /*  pDevice->Clear(clearColor);
     for (int x = 0; x < 200; ++x)
     {
         for (int y = 0; y <255; ++y)
             pDevice->DrawPiexl(x, y, Color::ToRGB(y/255.0f, 0, 0));
     }
 
-    pDevice->ApplyToScreen();
+    pDevice->ApplyToScreen();*/
 
     MSG msg;
 
     // 主消息循环:
-    while (GetMessage(&msg, nullptr, 0, 0))
+  /*  while (GetMessage(&msg, nullptr, 0, 0))
     {
         if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
+        }
+    }*/
+
+    DWORD last = GetTickCount();
+    msg = { 0 };
+    while (msg.message != WM_QUIT)
+    {
+        if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+        {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        else
+        {
+            DWORD now = GetTickCount();
+            DWORD cost = now - last;
+            
+          /*  pDevice->Clear(clearColor);
+            for (int x = 0; x < 200; ++x)
+            {
+                for (int y = 0; y <255; ++y)
+                    pDevice->DrawPiexl(x, y, Color::ToRGB(y/255.0f, 0, 0));
+            }
+            
+            pDevice->ApplyToScreen();*/
+            pScene->Update(((float)cost * 0.001f));
+            pPipline->Render(pScene, pDevice, clearColor);           
+           
+            last = now;
         }
     }
 
@@ -94,7 +131,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 //
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
-    WNDCLASSEXW wcex;
+    WNDCLASSEX wcex;
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
@@ -106,11 +143,11 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_SOFTRENDERPROJECT));
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_SOFTRENDERPROJECT);
+    wcex.lpszMenuName = NULL;//MAKEINTRESOURCEW(IDC_SOFTRENDERPROJECT);
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
-    return RegisterClassExW(&wcex);
+    return RegisterClassEx(&wcex);
 }
 
 //
@@ -127,8 +164,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // 将实例句柄存储在全局变量中
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+  /* HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);*/
+   /*HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+       200, 200, 816, 639, nullptr, nullptr, hInstance, nullptr);*/
+   HWND hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+       200, 200, 816, 639, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -176,14 +217,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
-    case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: 在此处添加使用 hdc 的任何绘图代码...
-            EndPaint(hWnd, &ps);
-        }
-        break;
+    //case WM_PAINT:
+    //    {
+    //        PAINTSTRUCT ps;
+    //        HDC hdc = BeginPaint(hWnd, &ps);
+    //        // TODO: 在此处添加使用 hdc 的任何绘图代码...
+    //        EndPaint(hWnd, &ps);
+    //    }
+    //    break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;

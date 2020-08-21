@@ -6,6 +6,7 @@
 
 //#define CLAMP(a, min, max) a = std::min(std::max(a,min),max);
 #define SAFE_DELETE(p) if(p){delete p; p = NULL;}
+#define SAFE_RELEASE(p) if (p){p->Release(); delete p; p=NULL;}
 
 #define PI 3.1415f
 #define AngleToRad(angle) angle * PI/180.0f

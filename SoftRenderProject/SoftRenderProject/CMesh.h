@@ -1,8 +1,10 @@
 #pragma once
 #include "stdio.h"
+#include <string>
+#include"ResourcesBase.h"
 
 class Vertex;
-class CMesh
+class CMesh : public ResourcesBase
 {
 public:
 	~CMesh()
@@ -10,6 +12,7 @@ public:
 		Release();
 	}
 
+	std::string file;
 	Vertex* m_pVextexs = NULL;
 	int m_vextexCnt;
 

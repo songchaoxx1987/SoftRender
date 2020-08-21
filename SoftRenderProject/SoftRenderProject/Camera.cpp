@@ -25,33 +25,30 @@ Matrix4x4 Camera::GetMatrix_View()
 	Vector3 upDir = Vector3::Cross(rightDir, lookDir);
 	upDir.Normalize();
 	 
+	float tx = -Vector3::Dot(rightDir, m_position);
+	float ty = -Vector3::Dot(upDir, m_position);
+	float tz = Vector3::Dot(lookDir, m_position);
 	Matrix4x4 m;	
 	m[0] = rightDir.x; 
 	m[1] = rightDir.y;
 	m[2] = rightDir.z;
-	m[3] = 0;
+	m[3] = tx;
 	
 	m[4] = upDir.x;
 	m[5] = upDir.y;
 	m[6] = upDir.z;
-	m[7] = 0;
+	m[7] = ty;
 	
 	m[8] = -lookDir.x;
 	m[9] = -lookDir.y;
 	m[10] = -lookDir.z;
-	m[11] = 0;
+	m[11] = tz;
 
 	m[12] = 0;
 	m[13] = 0; 
 	m[14] = 0;	   
 	m[15] = 1;
-
-	Matrix4x4 t;
-	t[3] = -m_position.x;
-	t[7] = -m_position.y;
-	t[11] = -m_position.z;
-
-	return m * t;
+	return m;	
 }
 
 Matrix4x4 Camera::GetMatrix_Proj()
@@ -59,7 +56,7 @@ Matrix4x4 Camera::GetMatrix_Proj()
 	//x,y,z->[-1,1]
 	// ÓÒÊÖÏµ near > far
 	Matrix4x4 proj;
-	if (mode == Perspective)
+	if (mode == Orthographic)
 	{
 		Matrix4x4 s;
 		s[0] = 2.0f / (_right - _left);
@@ -81,6 +78,7 @@ Matrix4x4 Camera::GetMatrix_Proj()
 		proj[10] = (_nearPlane + _farPlane) / (_nearPlane - _farPlane);
 		proj[11] = -2*_nearPlane *_farPlane/(_nearPlane - _farPlane);
 		proj[14] = 1.0f;
+		proj[15] = 0.0f;
 	}	
 	return proj;
 
@@ -88,6 +86,7 @@ Matrix4x4 Camera::GetMatrix_Proj()
 
 void Camera::SetOrthoCameraInfo(float size, float aspect, float nearPlane, float farPlane)
 {
+	mode = CAMERA_PROJECTION_MODE::Orthographic;
 	_left = - size / aspect;
 	_right = size / aspect;
 
@@ -100,6 +99,7 @@ void Camera::SetOrthoCameraInfo(float size, float aspect, float nearPlane, float
 
 void Camera::SetPerspectiveCameraInfo(float fov, float aspect, float nearPlane, float farPlane)
 {
+	mode = CAMERA_PROJECTION_MODE::Perspective;
 	_fov = fov;
 	_aspect = aspect;
 	_nearPlane = -nearPlane;

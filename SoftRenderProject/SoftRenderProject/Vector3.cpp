@@ -7,13 +7,13 @@
 
 Vector3 Vector3::operator+(const Vector3& right)const
 {
-	Vector3 ret(x + right.x, y + right.y, z + right.z);
+	Vector3 ret(x + right.x, y + right.y, z + right.z, w + right.w);
 	return ret;
 }
 
 Vector3 Vector3::operator-(const Vector3& right)const
 {
-	Vector3 ret(x - right.x, y - right.y, z - right.z);
+	Vector3 ret(x - right.x, y - right.y, z - right.z, w - right.w);
 	return ret;
 }
 
@@ -57,7 +57,7 @@ Vector3 Vector3::Cross(const Vector3& left, const Vector3& right)
 	float valueX = left.y * right.z - left.z * right.y;
 	float valueY = left.z * right.x - left.x * right.z;
 	float valueZ = left.x * right.y - left.y * right.x;	
-	return Vector3(valueX, valueY, valueZ);
+	return Vector3(valueX, valueY, valueZ, 0);
 }
 
 Vector3 Vector3::Lerp(const Vector3& from, const Vector3& to, float t)

@@ -158,6 +158,9 @@
     <ClInclude Include="RenderObject.h" />
     <ClInclude Include="RenderPipeline.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="ResourcesBase.h" />
+    <ClInclude Include="ResourcesManager.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="SoftRenderProject.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Texture.h" />
@@ -177,6 +180,8 @@
     <ClCompile Include="Matrix4x4.cpp" />
     <ClCompile Include="RenderObject.cpp" />
     <ClCompile Include="RenderPipeline.cpp" />
+    <ClCompile Include="ResourcesManager.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Trangle.cpp" />
     <ClCompile Include="Transform.cpp" />

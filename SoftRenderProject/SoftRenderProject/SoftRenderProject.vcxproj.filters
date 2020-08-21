@@ -30,9 +30,6 @@
     <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="SoftRenderProject.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Vector3.h">
       <Filter>game3D</Filter>
     </ClInclude>
@@ -75,8 +72,20 @@
     <ClInclude Include="Material.h">
       <Filter>game3D</Filter>
     </ClInclude>
+    <ClInclude Include="ResourcesManager.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
+    <ClInclude Include="SoftRenderProject.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
     <ClInclude Include="Trangle.h">
-      <Filter>头文件</Filter>
+      <Filter>game3D</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourcesBase.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>game3D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -138,8 +147,14 @@
     <ClCompile Include="Material.cpp">
       <Filter>game3D</Filter>
     </ClCompile>
+    <ClCompile Include="ResourcesManager.cpp">
+      <Filter>game3D</Filter>
+    </ClCompile>
     <ClCompile Include="Trangle.cpp">
-      <Filter>源文件</Filter>
+      <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>game3D</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

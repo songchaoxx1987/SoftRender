@@ -5,7 +5,7 @@
 
 enum CAMERA_PROJECTION_MODE
 {
-	Perspective,
+	Perspective = 0,
 	Orthographic
 };
 

@@ -1,13 +1,30 @@
 #pragma once
+#include<string>
+#include "Color.h"
 
-struct  Color;
 class Texture;
+
+
+class MaterialConfig
+{
+public :
+	std::string texFile;
+	Color color;
+	bool isAlphaBlend;
+	bool isAplhaTest;
+	bool zWrite;
+	bool zTest;
+	bool LoadFromFile(std::string file);	
+};
+
 class Material
 {
 public:
-	Material();	
+	Material();
+	~Material();
+	
 	Texture* pTexture;
-	Color* pColor;
+	Color color;
 
 	bool isAlphaBlend;
 	bool isAplhaTest;
@@ -15,6 +32,7 @@ public:
 	bool zTest;
 	//int cullOp;	// 0 ≤ªºÙ≤√ 1 À≥ ±’Î 2 ƒÊ ±’Î 
 
-	UINT32 GetColor(float u, float v);
+	UINT32 GetColor(float u, float v);	
 };
+
 

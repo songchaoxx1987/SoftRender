@@ -8,6 +8,7 @@
 #include "CDevice.h"
 #include "CMesh.h"
 #include "Trangle.h"
+#include "Scene.h"
 
 RenderPipeline::RenderPipeline()
 {	
@@ -18,16 +19,18 @@ RenderPipeline::~RenderPipeline()
 {	
 }
 
-void RenderPipeline::Render(RENDER_LIST * pRenderlist, Camera *pCamera, CDevice* pDevice, UINT32 bgColor)
+void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, UINT32 bgColor)
 {	
 	pDevice->ClearZBuffer();
 	pDevice->Clear(bgColor);
 	
-	Matrix4x4 vp = pCamera->GetMatrix_Proj() * pCamera->GetMatrix_View();
+	Matrix4x4 v = pScene->m_pMainCamera->GetMatrix_View();
+	Matrix4x4 p = pScene->m_pMainCamera->GetMatrix_Proj();
+	Matrix4x4 vp = pScene->m_pMainCamera->GetMatrix_Proj() * pScene->m_pMainCamera->GetMatrix_View();
 	std::vector<Trangle> trangles;
 	std::vector<int> outIdx;
-	RENDER_LIST::iterator it = pRenderlist->begin();
-	for (; it != pRenderlist->end();++it)
+	RENDER_LIST::iterator it = pScene->m_renderObjects.begin();
+	for (; it != pScene->m_renderObjects.end();++it)
 	{
 		trangles.clear();
 		outIdx.clear();
@@ -41,21 +44,25 @@ void RenderPipeline::Render(RENDER_LIST * pRenderlist, Camera *pCamera, CDevice*
 			for (int j = 0; j < 3; ++j)
 			{
 				// mvp
-				t.v[j] = pObj->m_pMesh->m_pVextexs[i];
+				t.v[j] = pObj->m_pMesh->m_pVextexs[i+j];
+				auto v1 = m2w.mul(t.v[j].position);
+				auto v2 = v.mul(v1);
+				auto v3 = p.mul(v2);
+				auto v4 = v3 * (1.0f / v3.w);
 				t.v[j].position = mvp.mul(t.v[j].position);
+
+				// 透视除法
+				float reciprocalW = 1.0f / t.v[j].position.w;
+				t.v[j].position = t.v[j].position * reciprocalW;
 				//cvv
 				if (!CVVCheck(&t.v[j]))
 				{
 					drop = true;
 					break;
-				}
-				// 透视除法
-				float reciprocalW = 1.0f / t.v[j].position.w;
-				t.v[j].position = t.v[j].position * reciprocalW;	
-				// to do uv normal插值
+				}						
 				//视口映射
 				t.v[j].position.x = (t.v[j].position.x + 1) * pDevice->screenWidth * 0.5f;
-				t.v[j].position.y = (1 - t.v[j].position.x) * pDevice->screenHeight * 0.5f;
+				t.v[j].position.y = (1 - t.v[j].position.y) * pDevice->screenHeight * 0.5f;
 				t.v[j].rhw = reciprocalW;
 			}	
 			if (!drop)
@@ -70,16 +77,17 @@ void RenderPipeline::Render(RENDER_LIST * pRenderlist, Camera *pCamera, CDevice*
 			pDevice->RasterizeTrangle(t, pObj->m_pMaterial);
 		}
 	}
+	pDevice->ApplyToScreen();
 }
 
 bool RenderPipeline::CVVCheck(Vertex *pVertex)
 {
 	float w = pVertex->position.w;
-	if (pVertex->position.x < -w || pVertex->position.x > w)
+	if (pVertex->position.x < -1.0f || pVertex->position.x > 1.0f)
 		return false;
-	if (pVertex->position.y < -w || pVertex->position.y > w)
+	if (pVertex->position.y < -1.0f || pVertex->position.y > 1.0f)
 		return false;
-	if (pVertex->position.z < -w || pVertex->position.z > w)
+	if (pVertex->position.z < -1.0f || pVertex->position.z > 1.0f)
 		return false;
 	return true;
 }
