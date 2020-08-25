@@ -40,8 +40,8 @@ Color Texture::Sample(float u, float v)
 	v = Clamp<float>(v, 0, 1.0f);
 	//暂时直接采用clamp01的方式采样
 	int intu = (width - 1) * u;
+	//int intv = (height - 1) * v;
 	int intv = (height - 1) * (1.0f - v);
-	//int intv = (height - 1) * (v);
 	return textureData[intu][intv];
 }
 

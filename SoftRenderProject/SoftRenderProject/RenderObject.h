@@ -16,6 +16,7 @@ public:
 	Transform m_transform;
 	CMesh *m_pMesh;
 	Material *m_pMaterial;
+	bool enableMove = false;
 
 	void Create(std::string meshFile, std::string matFile);
 

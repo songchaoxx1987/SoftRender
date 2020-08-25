@@ -19,7 +19,7 @@ Matrix4x4 Camera::GetMatrix_View()
 	Vector3 lookDir = m_lookAt - m_position;
 	lookDir.Normalize();
 
-	Vector3 rightDir = Vector3::Cross(Vector3(0, 1, 0), lookDir);
+	Vector3 rightDir = Vector3::Cross(lookDir, Vector3(0, 1, 0));
 	rightDir.Normalize();
 
 	Vector3 upDir = Vector3::Cross(rightDir, lookDir);
@@ -73,9 +73,9 @@ Matrix4x4 Camera::GetMatrix_Proj()
 	else
 	{
 		float tanValue = tan(0.5f * AngleToRad(_fov));
-		proj[0] = 1.0f / (tanValue * _aspect);
-		proj[5] = 1.0f / (tanValue);
-		proj[10] = (_nearPlane + _farPlane) / (_nearPlane - _farPlane);
+		proj[0] = -1.0f / (tanValue * _aspect);	// 因为是摄像机是朝向-z，所以这里有负号
+		proj[5] = -1.0f / (tanValue);
+		proj[10] = -(_nearPlane + _farPlane) / (_nearPlane - _farPlane);
 		proj[11] = -2*_nearPlane *_farPlane/(_nearPlane - _farPlane);
 		proj[14] = 1.0f;
 		proj[15] = 0.0f;
@@ -102,6 +102,6 @@ void Camera::SetPerspectiveCameraInfo(float fov, float aspect, float nearPlane, 
 	mode = CAMERA_PROJECTION_MODE::Perspective;
 	_fov = fov;
 	_aspect = aspect;
-	_nearPlane = -nearPlane;
-	_farPlane = -farPlane;
+	_nearPlane = nearPlane;
+	_farPlane = farPlane;
 }

@@ -17,6 +17,8 @@ public:
     //void ZWrite(int x, int y, float z);
     void ApplyToScreen();
 
+    int pixelCnt;;
+    int pixelRealCnt;
     int screenWidth;
     int screenHeight;
 protected:            

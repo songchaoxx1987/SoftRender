@@ -3,9 +3,11 @@
 #include "Material.h"
 #include "Texture.h"
 
-#define I(a,b) a.y - b.y
-#define J(a,b) b.x - a.x
-#define F(a,b) a.x * b.y - b.x * a.y
+#define MAX_FLAT 99999
+
+//#define I(a,b) a.y - b.y
+//#define J(a,b) b.x - a.x
+//#define F(a,b) a.x * b.y - b.x * a.y
 
 
 
@@ -57,7 +59,11 @@ void CDevice::Clear(UINT32 color)
 	for (int y = 0; y < screenHeight; ++y)
 	{
 		for (int x = 0; x < screenWidth; ++x)
-			frameBuffer[y][x] = color;	
+		{
+			frameBuffer[y][x] = color;
+			zBuffer[y][x] = MAX_FLAT; 
+		}
+		
 	}
 }
 
@@ -67,7 +73,7 @@ void CDevice::ClearZBuffer()
 	for (int y = 0; y < screenHeight; ++y)
 	{
 		for (int x = 0; x < screenWidth; ++x)
-			zBuffer[y][x] = -1.0f;		
+			zBuffer[y][x] = MAX_FLAT;
 	}
 }
 
@@ -77,6 +83,7 @@ void CDevice::ApplyToScreen()
 	BitBlt(hDC, 0, 0, screenWidth, screenHeight, hMemDc, 0, 0, SRCCOPY);
 	ReleaseDC(hMainWnd, hDC);
 }
+
 
 void CDevice::RasterizeTrangle(Trangle* pTrangle, Material* pMat)
 {
@@ -93,12 +100,14 @@ void CDevice::RasterizeTrangle(Trangle* pTrangle, Material* pMat)
 	Vector2 ca = pTrangle->v[0].position - pTrangle->v[2].position;	
 	
 	float areaTrangle2 = abs(Vector2::Cross(ab, bc));
-
+	if (areaTrangle2 <= 0)
+		return;
 	for (int y = minY; y <= maxY; ++y)
 	{
 		bool inside = false;
 		for (int x = minX; x <= maxX; ++x)
 		{
+			++pixelCnt;
 			Vector3 p(x, y, 0);
 			Vector2 ap = p - pTrangle->v[0].position;
 			Vector2 bp = p - pTrangle->v[1].position;
@@ -107,26 +116,27 @@ void CDevice::RasterizeTrangle(Trangle* pTrangle, Material* pMat)
 			float c1 = Vector2::Cross(ab, ap);
 			float c2 = Vector2::Cross(bc, bp);
 			float c3 = Vector2::Cross(ca, cp);
-			if ((c1 > 0 && c2 > 0 && c3 > 0) || (c1 < 0 && c2 < 0 && c3 < 0))
+			if (/*(c1 >= 0 && c2 >= 0 && c3 >= 0) || */(c1 <= 0 && c2 <= 0 && c3 <= 0))
 			{
 				inside = true;
-				float lamda1 = abs(c1 / areaTrangle2) * pTrangle->v[0].rhw;
-				float lamda2 = abs(c2 / areaTrangle2) * pTrangle->v[1].rhw;
-				float lamda3 = abs(c3 / areaTrangle2) * pTrangle->v[2].rhw;
+
+				float lamda1 = abs(c2 / areaTrangle2) / pTrangle->v[0].position.z;
+				float lamda2 = abs(c3 / areaTrangle2) / pTrangle->v[1].position.z;
+				float lamda3 = abs(c1 / areaTrangle2) / pTrangle->v[2].position.z;
+
+				//float lamda1 = abs(c2 / areaTrangle2) * pTrangle->v[0].rhw;
+				//float lamda2 = abs(c3 / areaTrangle2) * pTrangle->v[1].rhw;
+				//float lamda3 = abs(c1 / areaTrangle2) * pTrangle->v[2].rhw;
 
 				float rhw = lamda1 + lamda2 + lamda3;		
 				float z = 1.0f / rhw;
-				if (pMat->zTest && zBuffer[x][y] > rhw)
+				if (pMat->zTest && zBuffer[y][x] < z)
 					continue;
 				if (pMat->zWrite)
-					zBuffer[x][y] = rhw;
-				
-				
-				Vector2 uv = (pTrangle->v[0].uv * lamda1 + pTrangle->v[1].uv * lamda2 + pTrangle->v[2].uv * lamda3);
-				uv = uv * z;
-				//Vector2 uv = (pTrangle->v[0].uv * lamda1 + pTrangle->v[1].uv * lamda2 + pTrangle->v[2].uv * lamda3);
-				UINT32 rgb = pMat->GetColor(uv.x, uv.y);
-					
+					zBuffer[y][x] = z;
+				++pixelRealCnt;
+				Vector2 uv = (pTrangle->v[0].uv * lamda1 + pTrangle->v[1].uv * lamda2 + pTrangle->v[2].uv * lamda3) * z;
+				UINT32 rgb = pMat->GetColor(uv.x, uv.y);					
 				DrawPiexl(x, y, rgb);
 			}
 			else
@@ -136,52 +146,4 @@ void CDevice::RasterizeTrangle(Trangle* pTrangle, Material* pMat)
 			}		
 		}
 	}
-
-
-	//int i0 = I(pTrangle->v[0].position, pTrangle->v[1].position);
-	//int i1 = I(pTrangle->v[1].position, pTrangle->v[2].position);
-	//int i2 = I(pTrangle->v[2].position, pTrangle->v[0].position);
-
-	//int j0 = J(pTrangle->v[0].position, pTrangle->v[1].position);
-	//int j1 = J(pTrangle->v[1].position, pTrangle->v[2].position);
-	//int j2 = J(pTrangle->v[2].position, pTrangle->v[0].position);
-
-	//int f0 = F(pTrangle->v[0].position, pTrangle->v[1].position);
-	//int f1 = F(pTrangle->v[1].position, pTrangle->v[2].position);
-	//int f2 = F(pTrangle->v[2].position, pTrangle->v[0].position);
-	
-
-	//int y0 = f0;
-	//int y1 = f1;
-	//int y2 = f2;
-	//for (int y = minY; y <= maxY; ++y)
-	//{
-	//	int x0 = y0;
-	//	int x1 = y1;
-	//	int x2 = y2;
-	//	bool inside = false;
-	//	for (int x = minX; x <= maxX; ++x)
-	//	{
-	//		if (x0 >= 0 && x1 >= 0 && x2 >= 0)
-	//		{			
-	//			float u = 0;
-	//			float v = 0;
-	//			// to do uv lerp
-	//			DrawPiexl(x, y, pMat->GetColor(u, v));
-	//			inside = true;
-	//		}
-	//		else
-	//		{
-	//			if (inside)
-	//				break;
-	//		}
-	//		x0 += i0;
-	//		x1 += i1;
-	//		x2 += i2;
-	//	}
-	//	y0 += j0;
-	//	y1 += j1;
-	//	y2 += j2;
-	//}
-
 }

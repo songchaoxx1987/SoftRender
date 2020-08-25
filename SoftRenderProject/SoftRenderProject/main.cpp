@@ -89,7 +89,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             DispatchMessage(&msg);
         }
     }*/
-
+        
+    DWORD tick = 0;
+    int fps = 0;
     DWORD last = GetTickCount();
     msg = { 0 };
     while (msg.message != WM_QUIT)
@@ -114,7 +116,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             pDevice->ApplyToScreen();*/
             pScene->Update(((float)cost * 0.001f));
             pPipline->Render(pScene, pDevice, clearColor);           
-           
+            ++fps;
+            tick += cost;
+            if (tick >= 1000)
+            {                
+                printf("FPS:%d\n", fps);
+                fps = 0;
+                tick = 0;
+            }
             last = now;
         }
     }

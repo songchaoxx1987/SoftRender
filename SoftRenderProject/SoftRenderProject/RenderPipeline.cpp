@@ -21,7 +21,7 @@ RenderPipeline::~RenderPipeline()
 
 void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, UINT32 bgColor)
 {	
-	pDevice->ClearZBuffer();
+	//pDevice->ClearZBuffer();
 	pDevice->Clear(bgColor);
 	
 	Matrix4x4 v = pScene->m_pMainCamera->GetMatrix_View();
@@ -45,10 +45,10 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, UINT32 bgColor)
 			{
 				// mvp
 				t.v[j] = pObj->m_pMesh->m_pVextexs[i+j];
-				auto v1 = m2w.mul(t.v[j].position);
-				auto v2 = v.mul(v1);
-				auto v3 = p.mul(v2);
-				auto v4 = v3 * (1.0f / v3.w);
+				//auto v1 = m2w.mul(t.v[j].position);
+				//auto v2 = v.mul(v1);
+				//auto v3 = p.mul(v2);
+				//auto v4 = v3 * (1.0f / v3.w);
 				t.v[j].position = mvp.mul(t.v[j].position);
 
 				// 透视除法
@@ -61,8 +61,8 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, UINT32 bgColor)
 					break;
 				}						
 				//视口映射
-				t.v[j].position.x = (t.v[j].position.x + 1) * pDevice->screenWidth * 0.5f;
-				t.v[j].position.y = (1 - t.v[j].position.y) * pDevice->screenHeight * 0.5f;
+				t.v[j].position.x = (int)((t.v[j].position.x + 1) * pDevice->screenWidth * 0.5f + 0.5f);
+				t.v[j].position.y = (int)((1 - t.v[j].position.y) * pDevice->screenHeight * 0.5f + 0.5f);
 				t.v[j].rhw = reciprocalW;
 			}	
 			if (!drop)
@@ -71,11 +71,14 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, UINT32 bgColor)
 
 
 		// 绘制三角形
+		pDevice->pixelCnt = 0;
+		pDevice->pixelRealCnt = 0;
 		for (int i = 0; i < trangles.size(); ++i)
 		{
 			auto t = &trangles[i];
 			pDevice->RasterizeTrangle(t, pObj->m_pMaterial);
 		}
+		//printf("pixelCount: %d pixelRealCnt:%d \n", pDevice->pixelCnt, pDevice->pixelRealCnt);
 	}
 	pDevice->ApplyToScreen();
 }
