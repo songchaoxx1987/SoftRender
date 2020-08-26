@@ -12,7 +12,7 @@ public:
 	Matrix4x4 operator - (const Matrix4x4& right) const;
 	Matrix4x4 operator * (const Matrix4x4& right) const;
 	Matrix4x4 operator * (float k) const;
-	Vector3 mul(const Vector3& v) const;
+	Vector3 mul(const Vector3& v) const;	
 	
 	void Identity();
 	void Transpose();

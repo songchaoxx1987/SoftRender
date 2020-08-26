@@ -29,6 +29,12 @@ Vector3 Vector3::operator / (float value) const
 	return ret;
 }
 
+Vector3 Vector3::operator-()const
+{
+	Vector3 ret(-x, -y, -z, w);
+	return ret;
+}
+
 float Vector3::SquareMagnitude()
 {
 	return x*x + y*y + z*z;

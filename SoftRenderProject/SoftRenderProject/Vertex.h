@@ -11,6 +11,9 @@ public:
 	Color color;
 	Vector2 uv;
 
+	Vector3 uv1;
+	Vector3 uv2;
+	
 	float rhw;
 };
 

@@ -4,6 +4,7 @@
 #include "Texture.h"
 #include "Material.h"
 #include "Color.h"
+#include "Shaders.h"
 
 ResourcesManager* ResourcesManager::_pInstance = NULL;
 
@@ -69,6 +70,7 @@ Material* ResourcesManager::CreateMaterial(std::string matName)
 	pMat->isAplhaTest = pCfg->isAplhaTest;
 	pMat->zWrite = pCfg->zWrite;
 	pMat->zTest = pCfg->zTest;
+	pMat->pShader = ShaderLib::Instance()->GetShader(pCfg->vsProgram, pCfg->psProgram);
 	return pMat;
 }
 

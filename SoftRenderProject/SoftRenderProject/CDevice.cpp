@@ -2,9 +2,10 @@
 #include "Trangle.h"
 #include "Material.h"
 #include "Texture.h"
+#include "Vertex.h"
 
 #define MAX_FLAT 99999
-
+#define LERP(a) (pTrangle->v[0].a * lamda1 + pTrangle->v[1].a * lamda2 + pTrangle->v[2].a * lamda3) * z;
 //#define I(a,b) a.y - b.y
 //#define J(a,b) b.x - a.x
 //#define F(a,b) a.x * b.y - b.x * a.y
@@ -86,26 +87,31 @@ void CDevice::ApplyToScreen()
 
 
 void CDevice::RasterizeTrangle(Trangle* pTrangle, Material* pMat)
-{
-	pTrangle->calcBounds();
-
-	int minX = pTrangle->bounds[0].x;
-	int maxX = pTrangle->bounds[1].x;
-	int minY = pTrangle->bounds[0].y;
-	int maxY = pTrangle->bounds[1].y;
-	
+{	
 	// 右手坐标系，逆时针	
 	Vector2 ab = pTrangle->v[1].position - pTrangle->v[0].position;
 	Vector2 bc = pTrangle->v[2].position - pTrangle->v[1].position;
 	Vector2 ca = pTrangle->v[0].position - pTrangle->v[2].position;	
 	
-	float areaTrangle2 = abs(Vector2::Cross(ab, bc));
-	if (areaTrangle2 <= 0)
-		return;
-	for (int y = minY; y <= maxY; ++y)
+	float areaTrangle2 = Vector2::Cross(ab, bc);	// 只处理逆时针的面
+	if (areaTrangle2 >= 0)
+		return;	
+	//areaTrangle2 = abs(areaTrangle2);
+	pTrangle->calcBounds();
+	int minX = pTrangle->bounds[0].x;
+	int maxX = pTrangle->bounds[1].x;
+	int minY = pTrangle->bounds[0].y;
+	int maxY = pTrangle->bounds[1].y;
+	
+	float oneDivZ0 = 1.0f / pTrangle->v[0].position.z;
+	float oneDivZ1 = 1.0f / pTrangle->v[1].position.z;
+	float oneDivZ2 = 1.0f / pTrangle->v[2].position.z;
+
+	Vertex v;
+	for (int y = minY; y <= maxY && y < screenHeight; ++y)
 	{
 		bool inside = false;
-		for (int x = minX; x <= maxX; ++x)
+		for (int x = minX; x <= maxX && x < screenWidth; ++x)
 		{
 			++pixelCnt;
 			Vector3 p(x, y, 0);
@@ -120,9 +126,9 @@ void CDevice::RasterizeTrangle(Trangle* pTrangle, Material* pMat)
 			{
 				inside = true;
 
-				float lamda1 = abs(c2 / areaTrangle2) / pTrangle->v[0].position.z;
-				float lamda2 = abs(c3 / areaTrangle2) / pTrangle->v[1].position.z;
-				float lamda3 = abs(c1 / areaTrangle2) / pTrangle->v[2].position.z;
+				float lamda1 = (c2 / areaTrangle2) * oneDivZ0;
+				float lamda2 = (c3 / areaTrangle2) * oneDivZ1;
+				float lamda3 = (c1 / areaTrangle2) * oneDivZ2;
 
 				//float lamda1 = abs(c2 / areaTrangle2) * pTrangle->v[0].rhw;
 				//float lamda2 = abs(c3 / areaTrangle2) * pTrangle->v[1].rhw;
@@ -134,10 +140,14 @@ void CDevice::RasterizeTrangle(Trangle* pTrangle, Material* pMat)
 					continue;
 				if (pMat->zWrite)
 					zBuffer[y][x] = z;
-				++pixelRealCnt;
-				Vector2 uv = (pTrangle->v[0].uv * lamda1 + pTrangle->v[1].uv * lamda2 + pTrangle->v[2].uv * lamda3) * z;
-				UINT32 rgb = pMat->GetColor(uv.x, uv.y);					
+				
+				v.uv = LERP(uv);
+				v.normal = LERP(normal);
+				v.uv1 = LERP(uv1);
+				//v.uv = (pTrangle->v[0].uv * lamda1 + pTrangle->v[1].uv * lamda2 + pTrangle->v[2].uv * lamda3) * z;
+				UINT32 rgb = pMat->ApplyPS(&v).ToRGB();
 				DrawPiexl(x, y, rgb);
+				++pixelRealCnt;
 			}
 			else
 			{

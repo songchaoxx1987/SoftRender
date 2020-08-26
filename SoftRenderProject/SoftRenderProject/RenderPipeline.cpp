@@ -9,6 +9,8 @@
 #include "CMesh.h"
 #include "Trangle.h"
 #include "Scene.h"
+#include "Material.h"
+#include "RenderContext.h"
 
 RenderPipeline::RenderPipeline()
 {	
@@ -24,19 +26,31 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, UINT32 bgColor)
 	//pDevice->ClearZBuffer();
 	pDevice->Clear(bgColor);
 	
+	RenderContext::m_pLights = &(pScene->m_lights);
+	RenderContext::pMainCamera = pScene->m_pMainCamera;
+
 	Matrix4x4 v = pScene->m_pMainCamera->GetMatrix_View();
 	Matrix4x4 p = pScene->m_pMainCamera->GetMatrix_Proj();
-	Matrix4x4 vp = pScene->m_pMainCamera->GetMatrix_Proj() * pScene->m_pMainCamera->GetMatrix_View();
+	Matrix4x4 vp = p*v ;// pScene->m_pMainCamera->GetMatrix_Proj()* pScene->m_pMainCamera->GetMatrix_View();
+
+	RenderContext::pView = &v;
+	RenderContext::pProj = &p;
+	RenderContext::pVP = &vp;
+
 	std::vector<Trangle> trangles;
-	std::vector<int> outIdx;
+	//std::vector<int> outIdx;
 	RENDER_LIST::iterator it = pScene->m_renderObjects.begin();
 	for (; it != pScene->m_renderObjects.end();++it)
 	{
 		trangles.clear();
-		outIdx.clear();
+		//outIdx.clear();
 		RenderObject *pObj = *it;
 		Matrix4x4 m2w = pObj->m_transform.Local2World();		
 		Matrix4x4 mvp = vp * m2w;
+
+		RenderContext::pM2W = &m2w;
+		RenderContext::pMVP = &mvp;
+
 		for (int i = 0; i < pObj->m_pMesh->m_vextexCnt; i+=3) 
 		{
 			Trangle t;
@@ -49,7 +63,9 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, UINT32 bgColor)
 				//auto v2 = v.mul(v1);
 				//auto v3 = p.mul(v2);
 				//auto v4 = v3 * (1.0f / v3.w);
-				t.v[j].position = mvp.mul(t.v[j].position);
+
+				pObj->m_pMaterial->ApplyVS(&t.v[j]);
+				//t.v[j].position = mvp.mul(t.v[j].position);
 
 				// Í¸ÊÓ³ý·¨
 				float reciprocalW = 1.0f / t.v[j].position.w;
@@ -78,7 +94,7 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, UINT32 bgColor)
 			auto t = &trangles[i];
 			pDevice->RasterizeTrangle(t, pObj->m_pMaterial);
 		}
-		//printf("pixelCount: %d pixelRealCnt:%d \n", pDevice->pixelCnt, pDevice->pixelRealCnt);
+		//printf("pixelCount: %d pixelRealCnt:%d per: %f\n", pDevice->pixelCnt, pDevice->pixelRealCnt,(float)pDevice->pixelRealCnt /(float)pDevice->pixelCnt);
 	}
 	pDevice->ApplyToScreen();
 }

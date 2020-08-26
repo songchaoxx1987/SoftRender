@@ -4,7 +4,7 @@
 #include "framework.h"
 #include "SoftRenderProject.h"
 #include "stdio.h"
-//#include "CMesh.h"
+#include "CTimer.h"
 #include "CDevice.h"
 #include "Color.h"
 #include "ResourcesManager.h"
@@ -105,16 +105,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         {
             DWORD now = GetTickCount();
             DWORD cost = now - last;
-            
-          /*  pDevice->Clear(clearColor);
-            for (int x = 0; x < 200; ++x)
-            {
-                for (int y = 0; y <255; ++y)
-                    pDevice->DrawPiexl(x, y, Color::ToRGB(y/255.0f, 0, 0));
-            }
-            
-            pDevice->ApplyToScreen();*/
-            pScene->Update(((float)cost * 0.001f));
+         
+            float dt = ((float)cost * 0.001f);
+            CTimer::Instance()->deltaTime = dt;
+            CTimer::Instance()->timePass += dt;
+            pScene->Update(dt);
             pPipline->Render(pScene, pDevice, clearColor);           
             ++fps;
             tick += cost;

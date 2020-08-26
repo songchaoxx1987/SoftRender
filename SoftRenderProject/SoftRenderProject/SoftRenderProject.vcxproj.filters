@@ -87,6 +87,15 @@
     <ClInclude Include="Scene.h">
       <Filter>game3D</Filter>
     </ClInclude>
+    <ClInclude Include="Shaders.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
+    <ClInclude Include="CTimer.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderContext.h">
+      <Filter>game3D</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SoftRenderProject.rc">
@@ -154,6 +163,15 @@
       <Filter>game3D</Filter>
     </ClCompile>
     <ClCompile Include="Scene.cpp">
+      <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Shaders.cpp">
+      <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="CTimer.cpp">
+      <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderContext.cpp">
       <Filter>game3D</Filter>
     </ClCompile>
   </ItemGroup>

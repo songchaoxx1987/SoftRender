@@ -1,6 +1,9 @@
 #include"framework.h"
 #include "Material.h"
 #include "Texture.h"
+#include "Vertex.h"
+#include "Shaders.h"
+#include "Matrix4x4.h"
 #include <iostream>
 #include <fstream>
 #include <list>
@@ -47,8 +50,20 @@ bool MaterialConfig::LoadFromFile(std::string file)
 		{
 			zTest = atoi(temp[1].c_str()) > 0;
 		}
+		else if (key == "vs")
+		{
+			vsProgram = temp[1];
+		}
+		else if (key == "ps")
+		{
+			psProgram = temp[1];
+		}
 	}
 	stream.close();
+	if (vsProgram.empty())
+		vsProgram = "default";
+	if (psProgram.empty())
+		psProgram = "default";
 	return true;
 }
 
@@ -61,16 +76,32 @@ Material::Material()
 	isAlphaBlend = false;
 	zWrite = true;
 	zTest = true;
+	pShader = NULL;
 }
 
 Material::~Material()
 {	
 	pTexture = NULL;
+	pShader = NULL;
 }
 
-UINT32 Material::GetColor(float u, float v)
+Color Material::GetColor(float u, float v)
 {
 	if (!pTexture)
-		return Color::ToRGB(1.0f, 1.0f, 1.0f);
-	return (color * pTexture->Sample(u, v)).ToRGB();
+		return Color(1.0f, 1.0f, 1.0f);
+	return (color * pTexture->Sample(u, v));
+}
+
+Color Material::ApplyPS(Vertex* pVex)
+{
+	if (!pShader || !pShader->pPSProgram)
+		return GetColor(pVex->uv.x, pVex->uv.y);
+	return pShader->pPSProgram->Method(pVex, this);
+}
+
+Vertex* Material::ApplyVS(Vertex* pVex)
+{
+	if (!pShader || !pShader->pVSProgram)			
+		return pVex;	
+	return pShader->pVSProgram->Method(pVex);
 }

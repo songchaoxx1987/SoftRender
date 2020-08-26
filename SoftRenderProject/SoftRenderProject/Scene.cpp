@@ -45,8 +45,9 @@ void Scene::Init()
 	pLight->transform.position = Vector3(0, 0, 0);
 	pLight->transform.euler = Vector3(50, 45, 0);
 	pLight->mode = LightMode::directLight;
-	pLight->color = Color(0.5f, 0.5f, 0.5f);
+	pLight->color = Color(0.87f, 0.27f, 0.59f);
 	pLight->castShadow = true;
+	pLight->CalcDir();
 
 	m_lights.push_back(pLight);
 }
