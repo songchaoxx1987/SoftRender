@@ -25,9 +25,12 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, UINT32 bgColor)
 {	
 	//pDevice->ClearZBuffer();
 	pDevice->Clear(bgColor);
-	
+	pScene->m_pMainCamera->BeforeRender();
+
 	RenderContext::m_pLights = &(pScene->m_lights);
 	RenderContext::pMainCamera = pScene->m_pMainCamera;
+	RenderContext::pAmbColor = &(pScene->ambLight);
+	
 
 	Matrix4x4 v = pScene->m_pMainCamera->GetMatrix_View();
 	Matrix4x4 p = pScene->m_pMainCamera->GetMatrix_Proj();

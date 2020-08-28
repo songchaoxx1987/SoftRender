@@ -4,6 +4,7 @@
 class Light;
 class Camera;
 class Matrix4x4;
+struct Color;
 
 class RenderContext
 {
@@ -15,7 +16,7 @@ public:
 	static Matrix4x4* pProj;
 	static Matrix4x4* pVP;
 	static Matrix4x4* pMVP;
-
+	static Color* pAmbColor;
 	static double Time()
 	{
 		return CTimer::Instance()->timePass;

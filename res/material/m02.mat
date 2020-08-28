@@ -4,3 +4,5 @@ alphaTest:1
 alphaBlend:1
 zWrite:1
 zTest:1
+vs:blin-phone
+ps:blin-phone

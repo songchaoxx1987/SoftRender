@@ -8,3 +8,4 @@ Matrix4x4* RenderContext::pView = NULL;
 Matrix4x4* RenderContext::pProj = NULL;
 Matrix4x4* RenderContext::pVP = NULL;
 Matrix4x4* RenderContext::pMVP = NULL;
+Color* RenderContext::pAmbColor = NULL;

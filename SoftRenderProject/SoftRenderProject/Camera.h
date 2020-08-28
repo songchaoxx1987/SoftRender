@@ -14,15 +14,32 @@ class Camera
 public:
 	Camera();
 	~Camera();
-
-	Vector3 m_position;
-	Vector3 m_lookAt;
+	void SetPosition(const Vector3& position) 
+	{ 
+		m_position = position; 
+		_dirtyFlag = true;
+	}
+	void SetLookAt(const Vector3& lookAt) 
+	{
+		m_lookAt = lookAt; 
+		_dirtyFlag = true;
+	}
+	Vector3 Position() const
+	{
+		return m_position;
+	}
 
 	void SetOrthoCameraInfo(float size, float aspect, float near, float far);
 	void SetPerspectiveCameraInfo(float fov, float aspect, float near, float far);
+	Vector3* GetWorldCorner();
 	Matrix4x4 GetMatrix_Proj();
 	Matrix4x4 GetMatrix_View();
+
+	void BeforeRender();
 private:
+	Vector3 m_position;
+	Vector3 m_lookAt;
+
 	float _nearPlane;
 	float _farPlane;
 	// Perspective
@@ -33,6 +50,10 @@ private:
 	float _right;
 	float _top;
 	float _bottom;
+
+	Vector3 _worldCorner[8];
+
+	bool _dirtyFlag = false;
 
 	CAMERA_PROJECTION_MODE mode;
 

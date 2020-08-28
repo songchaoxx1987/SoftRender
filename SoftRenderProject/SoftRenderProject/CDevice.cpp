@@ -143,7 +143,7 @@ void CDevice::RasterizeTrangle(Trangle* pTrangle, Material* pMat)
 				
 				v.uv = LERP(uv);
 				v.normal = LERP(normal);
-				v.uv1 = LERP(uv1);
+				v.worldPos = LERP(worldPos);
 				//v.uv = (pTrangle->v[0].uv * lamda1 + pTrangle->v[1].uv * lamda2 + pTrangle->v[2].uv * lamda3) * z;
 				UINT32 rgb = pMat->ApplyPS(&v).ToRGB();
 				DrawPiexl(x, y, rgb);

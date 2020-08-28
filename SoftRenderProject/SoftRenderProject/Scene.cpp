@@ -9,8 +9,8 @@ extern CDevice* pDevice;
 void Scene::Init()
 {
 	m_pMainCamera = new Camera();
-	m_pMainCamera->m_position = Vector3(0, 5, 5);
-	m_pMainCamera->m_lookAt = Vector3(0, 4, 4);
+	m_pMainCamera->SetPosition(Vector3(0, 5, 5));
+	m_pMainCamera->SetLookAt(Vector3(0, 4, 4));
 	//m_pMainCamera->m_position = Vector3(0, 0, 5);
 	//m_pMainCamera->m_lookAt = Vector3(0, 0, -4);
 	m_pMainCamera->SetPerspectiveCameraInfo(60, (float)pDevice->screenWidth / (float)pDevice->screenHeight, 0.1f, 1000);
@@ -20,7 +20,7 @@ void Scene::Init()
 	pObj->Create("Cube", "m02");
 	pObj->enableMove = true;
 	pObj->m_transform.position = Vector3(0, 0, 0);
-	pObj->m_transform.euler = Vector3(0, 0, 0);
+	//pObj->m_transform.euler = Vector3(0, 30, 0);
 	m_renderObjects.push_back(pObj);
 
 
@@ -36,20 +36,31 @@ void Scene::Init()
 	m_renderObjects.push_back(pObj);
 	pObj->m_transform.position = Vector3(1.5, 0, 0);
 	
-	/*pObj = new RenderObject();
-	pObj->Create("Cube", "m03");
+	pObj = new RenderObject();
+	pObj->Create("cow", "cow");
 	pObj->m_transform.position = Vector3(-1.5, 0, 0);
-	m_renderObjects.push_back(pObj);*/
+	pObj->m_transform.euler = Vector3(0, 180, 0);
+	//pObj->enableMove = true;	
+	m_renderObjects.push_back(pObj);
+
+	pObj = new RenderObject();
+	pObj->Create("cow", "cow2");
+	pObj->m_transform.position = Vector3(-1.5, 0, 2);
+	pObj->m_transform.euler = Vector3(0, 180, 0);
+	//pObj->enableMove = true;	
+	m_renderObjects.push_back(pObj);
 
 	Light* pLight = new Light();
 	pLight->transform.position = Vector3(0, 0, 0);
 	pLight->transform.euler = Vector3(50, 45, 0);
 	pLight->mode = LightMode::directLight;
-	pLight->color = Color(0.87f, 0.27f, 0.59f);
+	pLight->color = Color(0.3f, 0.37f, 0.51f);
 	pLight->castShadow = true;
 	pLight->CalcDir();
 
 	m_lights.push_back(pLight);
+
+	ambLight = Color(0.2f, 0.2f, 0.2f);
 }
 
 void Scene::Release()

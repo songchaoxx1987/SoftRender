@@ -75,6 +75,9 @@ void CMesh::LoadFromFile(const char* file)
 		}
 	}
 	stream.close();	
+
+	bounds[0].x = bounds[0].y = bounds[0].z = 99999999;
+	bounds[1].x = bounds[1].y = bounds[1].z = -99999999;
 	m_vextexCnt = posIdx.size();
 	m_pVextexs = new Vertex[m_vextexCnt];
 	for (int i = 0; i < m_vextexCnt; ++i)
@@ -82,6 +85,20 @@ void CMesh::LoadFromFile(const char* file)
 		m_pVextexs[i].position = positions[posIdx[i] - 1];
 		m_pVextexs[i].normal = normals[normalIdx[i] - 1];
 		m_pVextexs[i].uv = uvs[uvIdx[i] - 1];
+
+		if (m_pVextexs[i].position.x < bounds[0].x)
+			bounds[0].x = m_pVextexs[i].position.x;
+		if (m_pVextexs[i].position.y < bounds[0].y)
+			bounds[0].y = m_pVextexs[i].position.y;
+		if (m_pVextexs[i].position.z < bounds[0].z)
+			bounds[0].z = m_pVextexs[i].position.z;
+
+		if (m_pVextexs[i].position.x > bounds[1].x)
+			bounds[1].x = m_pVextexs[i].position.x;
+		if (m_pVextexs[i].position.y > bounds[1].y)
+			bounds[1].y = m_pVextexs[i].position.y;
+		if (m_pVextexs[i].position.z > bounds[1].z)
+			bounds[1].z = m_pVextexs[i].position.z;
 	}
 
 }

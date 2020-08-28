@@ -16,6 +16,8 @@ Camera::~Camera()
 
 Matrix4x4 Camera::GetMatrix_View()
 {
+	if (!_dirtyFlag)
+		return viewMatrix;
 	Vector3 lookDir = m_lookAt - m_position;
 	lookDir.Normalize();
 
@@ -48,11 +50,15 @@ Matrix4x4 Camera::GetMatrix_View()
 	m[13] = 0; 
 	m[14] = 0;	   
 	m[15] = 1;
+
+	viewMatrix = m;
 	return m;	
 }
 
 Matrix4x4 Camera::GetMatrix_Proj()
 {
+	if (!_dirtyFlag)
+		return projMatrix;
 	//x,y,z->[-1,1]
 	// ÓÒÊÖÏµ near > far
 	Matrix4x4 proj;
@@ -80,8 +86,89 @@ Matrix4x4 Camera::GetMatrix_Proj()
 		proj[14] = 1.0f;
 		proj[15] = 0.0f;
 	}	
+	projMatrix = proj;
 	return proj;
 
+}
+
+Vector3* Camera::GetWorldCorner()
+{
+	if (!_dirtyFlag)
+		return _worldCorner;
+	Vector3 lookDir = m_lookAt - m_position;
+	lookDir.Normalize();
+
+	Vector3 rightDir = Vector3::Cross(lookDir, Vector3(0, 1, 0));
+	rightDir.Normalize();
+
+	Vector3 upDir = Vector3::Cross(rightDir, lookDir);
+	upDir.Normalize();
+
+	Matrix4x4 m;
+	m[0] = rightDir.x;
+	m[1] = upDir.x;
+	m[2] = -lookDir.x;
+	m[3] = m_position.x;
+
+	m[4] = rightDir.y;
+	m[5] = upDir.y;
+	m[6] = -lookDir.y;
+	m[7] = m_position.y;
+
+	m[8] = rightDir.z;
+	m[9] = upDir.z;
+	m[10] = -lookDir.z;
+	m[11] = m_position.z;
+		
+	m[12] = 0;
+	m[13] = 0;
+	m[14] = 0;
+	m[15] = 1;
+	
+	float tanValue = tan(0.5f * AngleToRad(_fov));
+	Vector3 nearPos;
+	nearPos.z = -_nearPlane;
+	nearPos.y = _nearPlane * tanValue;
+	nearPos.x = nearPos.y * _aspect;
+
+	Vector3 farPos;
+	farPos.z = -_farPlane;
+	farPos.y = _farPlane * tanValue;
+	farPos.x = farPos.y * _aspect;
+		
+	_worldCorner[0].x = nearPos.x;
+	_worldCorner[0].y = nearPos.y;
+	_worldCorner[0].z = nearPos.z;
+
+	_worldCorner[1].x = -nearPos.x;
+	_worldCorner[1].y = nearPos.y;
+	_worldCorner[1].z = nearPos.z;
+
+	_worldCorner[2].x = -nearPos.x;
+	_worldCorner[2].y = -nearPos.y;
+	_worldCorner[2].z = nearPos.z;
+
+	_worldCorner[3].x = nearPos.x;
+	_worldCorner[3].y = -nearPos.y;
+	_worldCorner[3].z = nearPos.z;
+
+	_worldCorner[4].x = farPos.x;
+	_worldCorner[4].y = farPos.y;
+	_worldCorner[4].z = farPos.z;
+
+	_worldCorner[5].x = -farPos.x;
+	_worldCorner[5].y = farPos.y;
+	_worldCorner[5].z = farPos.z;
+
+	_worldCorner[6].x = -farPos.x;
+	_worldCorner[6].y = -farPos.y;
+	_worldCorner[6].z = farPos.z;
+
+	_worldCorner[7].x = farPos.x;
+	_worldCorner[7].y = -farPos.y;
+	_worldCorner[7].z = farPos.z;
+
+	return _worldCorner;
 }
 
 void Camera::SetOrthoCameraInfo(float size, float aspect, float nearPlane, float farPlane)
@@ -95,6 +182,7 @@ void Camera::SetOrthoCameraInfo(float size, float aspect, float nearPlane, float
 
 	_nearPlane = -nearPlane;
 	_farPlane = -farPlane;
+	_dirtyFlag = true;
 }
 
 void Camera::SetPerspectiveCameraInfo(float fov, float aspect, float nearPlane, float farPlane)
@@ -104,4 +192,15 @@ void Camera::SetPerspectiveCameraInfo(float fov, float aspect, float nearPlane, 
 	_aspect = aspect;
 	_nearPlane = nearPlane;
 	_farPlane = farPlane;
+	_dirtyFlag = true;
+}
+
+void Camera::BeforeRender()
+{
+	if (!_dirtyFlag)
+		return;
+	GetMatrix_Proj();
+	GetMatrix_View();
+	GetWorldCorner();
+	_dirtyFlag = false;
 }

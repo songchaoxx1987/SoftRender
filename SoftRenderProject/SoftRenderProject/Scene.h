@@ -28,6 +28,11 @@ public:
 		return _dir;
 	}
 
+	Vector3 InvDir()
+	{
+		return -_dir;
+	}
+
 private:
 	Vector3 _dir;	
 };
@@ -43,7 +48,7 @@ public:
 	Camera* m_pMainCamera;		
 	RENDER_LIST m_renderObjects;
 	LIGHT_LIST m_lights;
-
+	Color ambLight;
 	void Init();
 	void Release();
 	void Update(float dt);

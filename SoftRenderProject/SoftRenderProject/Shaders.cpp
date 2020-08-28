@@ -20,7 +20,7 @@ Vertex* VSProgramBase::Method(Vertex* pVertex)
 Vertex* VSWave::Method(Vertex* pVertex)
 {
 	auto pos = pVertex->position;
-	pos.y += 0.1f*sin(PI * RenderContext::Time() * pos.x * pos.z);
+	pos.y += 0.1f*sin(2* PI * RenderContext::Time() * pos.x * pos.z);
 	pVertex->position = RenderContext::pMVP->mul(pos);
 	return pVertex;
 }
@@ -32,9 +32,9 @@ Color PSProgramBase::Method(Vertex* pVertex, Material* pMat)
 
 Vertex* VSBlinPhone::Method(Vertex* pVertex)
 {
+	pVertex->worldPos = RenderContext::pM2W->mul(pVertex->position);	// worldPos
 	pVertex->position = RenderContext::pMVP->mul(pVertex->position);
-	pVertex->normal = RenderContext::pM2W->mul(pVertex->normal);
-	pVertex->uv1 = RenderContext::pM2W->mul(pVertex->position);	// worldPos
+	pVertex->normal = RenderContext::pM2W->mul(pVertex->normal);	
 	return pVertex;
 }
 
@@ -42,11 +42,11 @@ Color PSBlinPhone::Method(Vertex* pVertex, Material* pMat)
 {
 	pVertex->normal.Normalize();
 	Light* pLight = (*RenderContext::m_pLights)[0];
-	auto lightDir = -pLight->Dir();
+	auto lightDir = pLight->InvDir();
 
 	Color diffuse = pLight->color * max(0, Vector3::Dot(pVertex->normal, lightDir));
 	
-	auto viewDir = RenderContext::pMainCamera->m_position - pVertex->uv1;
+	auto viewDir = RenderContext::pMainCamera->Position() - pVertex->worldPos;
 	viewDir.Normalize();
 
 	auto halfDir = viewDir + lightDir;
@@ -54,7 +54,7 @@ Color PSBlinPhone::Method(Vertex* pVertex, Material* pMat)
 
 	Color spec = pLight->color * pow(max(0, Vector3::Dot(pVertex->normal, halfDir)), 0.5f);	// 2 gloss
 
-	return (diffuse + spec) * pMat->GetColor(pVertex->uv.x, pVertex->uv.y);
+	return ((*RenderContext::pAmbColor) + diffuse + spec) * pMat->GetColor(pVertex->uv.x, pVertex->uv.y);
 }
 
 ShaderLib::ShaderLib()
