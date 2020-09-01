@@ -67,7 +67,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     Scene* pScene = new Scene();
     pScene->Init();
 
-    RenderPipeline* pPipline = new RenderPipeline();
+    RenderPipeline* pPipline = new ForWardRenderPipeline();
 
   /*  pDevice->Clear(clearColor);
     for (int x = 0; x < 200; ++x)

@@ -1,7 +1,7 @@
 tex:line_01
 color:1,1,1,1
 alphaTest:0
-alphaBlend:1
+alphaBlend:0
 zWrite:1
 zTest:1
 vs:wave

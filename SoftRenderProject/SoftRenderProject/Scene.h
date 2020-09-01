@@ -1,6 +1,7 @@
 #pragma once
 #include "Transform.h"
 #include "Color.h"
+#include "define.h"
 #include <list>
 #include <vector>
 enum LightMode
@@ -37,10 +38,10 @@ private:
 	Vector3 _dir;	
 };
 
-class RenderObject;
+//class RenderObject;
 class Camera;
 
-typedef std::list<RenderObject*> RENDER_LIST;
+//typedef std::list<RenderObject*> RENDER_LIST;
 typedef std::vector<Light*> LIGHT_LIST;
 class Scene
 {
@@ -52,5 +53,8 @@ public:
 	void Init();
 	void Release();
 	void Update(float dt);
+	void CalcBounds();
+
+	Vector3 m_bounds[2];
 };
 

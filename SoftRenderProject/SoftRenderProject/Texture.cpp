@@ -34,6 +34,35 @@ bool Texture::LoadTexture(const char* path)
 	return true;
 }
 
+void Texture::CreateTexture(int w, int h, Color* pClr)
+{
+	height = h;
+	width = w;
+	Color c = pClr ? *pClr : Color(0, 0, 0, 1);
+	textureData = new Color * [width];
+	for (int i = 0; i < width; ++i)
+	{
+		textureData[i] = new Color[height];
+		for (int j = 0; j < height; ++j)
+		{			
+			textureData[i][j] = c;
+		}
+	}
+}
+
+void Texture::ClearTexture(Color* pClr)
+{
+	Color c = pClr ? *pClr : Color(0, 0, 0, 1);
+	for (int i = 0; i < width; ++i)
+	{	
+		for (int j = 0; j < height; ++j)
+		{
+			textureData[i][j] = c;
+		}
+	}
+}
+
+
 Color Texture::Sample(float u, float v)
 {
 	u = Clamp<float>(u, 0, 1.0f);
@@ -43,6 +72,15 @@ Color Texture::Sample(float u, float v)
 	//int intv = (height - 1) * v;
 	int intv = (height - 1) * (1.0f - v);
 	return textureData[intu][intv];
+}
+
+void Texture::SetPixel(float u, float v, Color& color)
+{
+	u = Clamp<float>(u, 0, 1.0f);
+	v = Clamp<float>(v, 0, 1.0f);	
+	int intu = (width - 1) * u;	
+	int intv = (height - 1) * (1.0f - v);
+	textureData[intu][intv] = color;
 }
 
 void Texture::Release()

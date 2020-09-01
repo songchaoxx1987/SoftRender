@@ -1,7 +1,7 @@
 tex:crate_1
 color:1,1,1,1
-alphaTest:1
-alphaBlend:1
+alphaTest:0
+alphaBlend:0
 zWrite:1
 zTest:1
 vs:blin-phone

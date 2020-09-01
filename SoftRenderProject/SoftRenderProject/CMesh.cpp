@@ -76,8 +76,8 @@ void CMesh::LoadFromFile(const char* file)
 	}
 	stream.close();	
 
-	bounds[0].x = bounds[0].y = bounds[0].z = 99999999;
-	bounds[1].x = bounds[1].y = bounds[1].z = -99999999;
+	bounds[0].x = bounds[0].y = bounds[0].z = MAX_FLAT;
+	bounds[1].x = bounds[1].y = bounds[1].z = -MAX_FLAT;
 	m_vextexCnt = posIdx.size();
 	m_pVextexs = new Vertex[m_vextexCnt];
 	for (int i = 0; i < m_vextexCnt; ++i)

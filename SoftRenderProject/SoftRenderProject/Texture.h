@@ -11,6 +11,10 @@ public:
 	int height;
 	bool LoadTexture(const char* Path);
 	Color Sample(float u, float v);
+	void SetPixel(float u, float v, Color &color);
+
+	void CreateTexture(int w, int h, Color *pClr);
+	void ClearTexture(Color* pClr);
 
 	void Release();
 

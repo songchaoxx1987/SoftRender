@@ -96,7 +96,7 @@ Color Material::ApplyPS(Vertex* pVex)
 {
 	if (!pShader || !pShader->pPSProgram)
 		return GetColor(pVex->uv.x, pVex->uv.y);
-	return pShader->pPSProgram->Method(pVex, this);
+	return pShader->pPSProgram->Method(pVex, this) * (1.0f - pShader->pPSProgram->AttenShadow(pVex));
 }
 
 Vertex* Material::ApplyVS(Vertex* pVex)

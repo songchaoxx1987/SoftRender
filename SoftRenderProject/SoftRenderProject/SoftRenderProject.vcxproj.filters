@@ -96,6 +96,9 @@
     <ClInclude Include="RenderContext.h">
       <Filter>game3D</Filter>
     </ClInclude>
+    <ClInclude Include="ShadowMap.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SoftRenderProject.rc">
@@ -173,6 +176,9 @@
     </ClCompile>
     <ClCompile Include="RenderContext.cpp">
       <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowMap.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

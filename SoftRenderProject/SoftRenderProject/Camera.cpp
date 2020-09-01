@@ -37,6 +37,7 @@ Matrix4x4 Camera::GetMatrix_View()
 	m[3] = tx;
 	
 	m[4] = upDir.x;
+
 	m[5] = upDir.y;
 	m[6] = upDir.z;
 	m[7] = ty;
@@ -64,17 +65,11 @@ Matrix4x4 Camera::GetMatrix_Proj()
 	Matrix4x4 proj;
 	if (mode == Orthographic)
 	{
-		Matrix4x4 s;
-		s[0] = 2.0f / (_right - _left);
-		s[5] = 2.0f / (_top - _bottom);
-		s[10] = 2.0f / (_nearPlane - _farPlane);
-		s[15] = 1.0f;
-		
-		Matrix4x4 t;
-		t[3] = -(_right + _left) / 2.0f;
-		t[7] = -(_top + _bottom) / 2.0f;
-		t[11] = -(_farPlane + _nearPlane) / 2.0f;
-		proj = s * t;
+		proj[0] = 1.0f / (_aspect * _size);
+		proj[5] = 1.0f / _size;
+		proj[10] = 2.0f / (_farPlane - _nearPlane);
+		proj[11] = (_farPlane + _nearPlane)/ (_farPlane - _nearPlane);
+		proj[15] = 1.0f;
 	}
 	else
 	{
@@ -91,10 +86,8 @@ Matrix4x4 Camera::GetMatrix_Proj()
 
 }
 
-Vector3* Camera::GetWorldCorner()
+Matrix4x4 Camera::GetMatrix_InvView()
 {
-	if (!_dirtyFlag)
-		return _worldCorner;
 	Vector3 lookDir = m_lookAt - m_position;
 	lookDir.Normalize();
 
@@ -119,12 +112,19 @@ Vector3* Camera::GetWorldCorner()
 	m[9] = upDir.z;
 	m[10] = -lookDir.z;
 	m[11] = m_position.z;
-		
+
 	m[12] = 0;
 	m[13] = 0;
 	m[14] = 0;
 	m[15] = 1;
-	
+	return m;
+}
+
+Vector3* Camera::GetWorldCorner(float maxFar)
+{
+	if (!_dirtyFlag)
+		return _worldCorner;
+	Matrix4x4 m = GetMatrix_InvView();	
 	float tanValue = tan(0.5f * AngleToRad(_fov));
 	Vector3 nearPos;
 	nearPos.z = -_nearPlane;
@@ -132,8 +132,9 @@ Vector3* Camera::GetWorldCorner()
 	nearPos.x = nearPos.y * _aspect;
 
 	Vector3 farPos;
-	farPos.z = -_farPlane;
-	farPos.y = _farPlane * tanValue;
+	float f = min(maxFar, _farPlane);
+	farPos.z = -f;
+	farPos.y = f * tanValue;
 	farPos.x = farPos.y * _aspect;
 		
 	_worldCorner[0].x = nearPos.x;
@@ -168,20 +169,17 @@ Vector3* Camera::GetWorldCorner()
 	_worldCorner[7].y = -farPos.y;
 	_worldCorner[7].z = farPos.z;
 
+	TransformArray(&m, _worldCorner, _worldCorner,8);
 	return _worldCorner;
 }
 
 void Camera::SetOrthoCameraInfo(float size, float aspect, float nearPlane, float farPlane)
 {
 	mode = CAMERA_PROJECTION_MODE::Orthographic;
-	_left = - size / aspect;
-	_right = size / aspect;
-
-	_top = size;
-	_bottom = -size;
-
-	_nearPlane = -nearPlane;
-	_farPlane = -farPlane;
+	_size = size;
+	_aspect = aspect;
+	_nearPlane = nearPlane;
+	_farPlane = farPlane;
 	_dirtyFlag = true;
 }
 
@@ -201,6 +199,6 @@ void Camera::BeforeRender()
 		return;
 	GetMatrix_Proj();
 	GetMatrix_View();
-	GetWorldCorner();
+	GetWorldCorner(10);
 	_dirtyFlag = false;
 }

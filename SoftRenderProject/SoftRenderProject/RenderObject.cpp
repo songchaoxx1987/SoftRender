@@ -2,6 +2,7 @@
 #include "RenderObject.h"
 #include "define.h"
 #include "ResourcesManager.h"
+#include "CMesh.h"
 
 RenderObject::RenderObject()
 {
@@ -28,4 +29,11 @@ void RenderObject::Release()
 	ResourcesManager::Instance()->ReleaseMaterial(m_pMaterial);
 	m_pMesh = NULL;
 	m_pMaterial = NULL;
+}
+
+void RenderObject::CalcBounds()
+{
+	auto m = m_transform.Local2World();
+	m_bounds[0] = m.mul(m_pMesh->bounds[0]);
+	m_bounds[1] = m.mul(m_pMesh->bounds[1]);
 }

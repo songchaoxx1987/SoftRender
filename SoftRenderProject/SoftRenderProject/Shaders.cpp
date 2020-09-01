@@ -7,6 +7,7 @@
 #include "RenderContext.h"
 #include "Scene.h"
 #include "Camera.h"
+#include "ShadowMap.h"
 
 ShaderLib* ShaderLib::_pInstance = NULL;
 
@@ -30,6 +31,13 @@ Color PSProgramBase::Method(Vertex* pVertex, Material* pMat)
 	return pMat->GetColor(pVertex->uv.x, pVertex->uv.y);
 }
 
+float PSProgramBase::AttenShadow(Vertex* pVertex)
+{
+	if (RenderContext::pShadowMap->IsInShadows(&(pVertex->worldPos)))
+		return 0.8f;
+	return 0.0f;
+}
+
 Vertex* VSBlinPhone::Method(Vertex* pVertex)
 {
 	pVertex->worldPos = RenderContext::pM2W->mul(pVertex->position);	// worldPos
@@ -44,8 +52,9 @@ Color PSBlinPhone::Method(Vertex* pVertex, Material* pMat)
 	Light* pLight = (*RenderContext::m_pLights)[0];
 	auto lightDir = pLight->InvDir();
 
-	Color diffuse = pLight->color * max(0, Vector3::Dot(pVertex->normal, lightDir));
-	
+	Color diffuse = pLight->color * max(0, Vector3::Dot(pVertex->normal, lightDir));	// lambert
+	//Color diffuse = pLight->color * (0.5f * Vector3::Dot(pVertex->normal, lightDir) + 1.0f); // half lambert
+
 	auto viewDir = RenderContext::pMainCamera->Position() - pVertex->worldPos;
 	viewDir.Normalize();
 

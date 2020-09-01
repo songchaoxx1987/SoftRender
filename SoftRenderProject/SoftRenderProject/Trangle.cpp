@@ -2,11 +2,11 @@
 
 void Trangle::calcBounds()
 {
-	bounds[0].x = 9999999;
-	bounds[0].y = 9999999;
+	bounds[0].x = MAX_FLAT;
+	bounds[0].y = MAX_FLAT;
 
-	bounds[1].x = -999999;
-	bounds[1].y = -999999;
+	bounds[1].x = -MAX_FLAT;
+	bounds[1].y = -MAX_FLAT;
 
 	for (int i = 0; i < 3; ++i)
 	{

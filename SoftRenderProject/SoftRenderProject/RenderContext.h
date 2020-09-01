@@ -4,6 +4,8 @@
 class Light;
 class Camera;
 class Matrix4x4;
+class CDevice;
+class ShadowMap;
 struct Color;
 
 class RenderContext
@@ -11,11 +13,13 @@ class RenderContext
 public:	
 	static std::vector<Light*> *m_pLights;
 	static Camera* pMainCamera;
+	static CDevice* pDevice;	
+	static ShadowMap* pShadowMap;
 	static Matrix4x4* pM2W;
 	static Matrix4x4* pView;
 	static Matrix4x4* pProj;
 	static Matrix4x4* pVP;
-	static Matrix4x4* pMVP;
+	static Matrix4x4* pMVP;	
 	static Color* pAmbColor;
 	static double Time()
 	{

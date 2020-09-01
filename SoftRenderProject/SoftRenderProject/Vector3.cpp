@@ -71,6 +71,24 @@ Vector3 Vector3::Lerp(const Vector3& from, const Vector3& to, float t)
 	return to * t + from * (1 - t);
 }
 
+Vector3 Vector3::Min(const Vector3& left, const Vector3& right)
+{
+	Vector3 ret;
+	ret.x = min(left.x, right.x);
+	ret.y = min(left.y, right.y);
+	ret.z = min(left.z, right.z);
+	return ret;
+}
+
+Vector3 Vector3::Max(const Vector3& left, const Vector3& right)
+{
+	Vector3 ret;
+	ret.x = max(left.x, right.x);
+	ret.y = max(left.y, right.y);
+	ret.z = max(left.z, right.z);
+	return ret;
+}
+
 Vector3::operator Vector2()
 {
 	Vector2 ret(x,y);

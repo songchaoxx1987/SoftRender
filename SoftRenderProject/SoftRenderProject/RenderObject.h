@@ -17,10 +17,10 @@ public:
 	CMesh *m_pMesh;
 	Material *m_pMaterial;
 	bool enableMove = false;
+	Vector3 m_bounds[2];
 
 	void Create(std::string meshFile, std::string matFile);
-
 	void Release();
-
+	void CalcBounds();
 };
 

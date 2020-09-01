@@ -1,4 +1,6 @@
 #include "define.h"
+#include "Matrix4x4.h"
+#include "Vector3.h"
 
 void split(std::string str, std::vector<std::string>& ret, char delim)
 {
@@ -24,5 +26,24 @@ void split(std::string str, std::vector<std::string>& ret, char delim)
 		std::string temp;
 		temp = str.substr(begin, i - begin);
 		ret.push_back(temp);
+	}
+}
+
+void TransformArray(Matrix4x4* pM, Vector3* pVArray, Vector3* ret, int size)
+{
+	for (int i = 0; i < size; ++i)
+	{
+		ret[i] = pM->mul(pVArray[i]);
+	}
+}
+
+void CalcBounds(Vector3* pCorners, Vector3* ret, int size)
+{
+	ret[0].x = ret[0].y = ret[0].z = MAX_FLAT;
+	ret[1].x = ret[1].y = ret[1].z = -MAX_FLAT;
+	for (int i = 0; i < size; ++i)
+	{
+		ret[0] = Vector3::Min(pCorners[i], ret[0]);
+		ret[1] = Vector3::Max(pCorners[i], ret[1]);
 	}
 }

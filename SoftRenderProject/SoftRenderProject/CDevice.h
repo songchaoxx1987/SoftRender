@@ -3,6 +3,8 @@
 #include"define.h"
 class Material;
 class Trangle;
+class RenderPipeline;
+
 class CDevice
 {
 public:
@@ -12,13 +14,20 @@ public:
     void Clear(UINT32 color);
     void ClearZBuffer();
 
-    void RasterizeTrangle(Trangle* pTrangle, Material* pMat);
-    //bool ZTest(int x, int y, float z, int op);
-    //void ZWrite(int x, int y, float z);
+    bool ZTest(int x, int y, float z)
+    {
+        return zBuffer[y][x] >= z;
+    }
+
+    void ZWrite(int x, int y, float z)
+    {
+        zBuffer[y][x] = z;
+    }
+
+    //void RasterizeTrangle(Trangle* pTrangle, Material* pMat, RenderPipeline* pPipeline);
+    
     void ApplyToScreen();
 
-    int pixelCnt;;
-    int pixelRealCnt;
     int screenWidth;
     int screenHeight;
 protected:            

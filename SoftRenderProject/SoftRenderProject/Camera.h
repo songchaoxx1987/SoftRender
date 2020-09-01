@@ -31,9 +31,10 @@ public:
 
 	void SetOrthoCameraInfo(float size, float aspect, float near, float far);
 	void SetPerspectiveCameraInfo(float fov, float aspect, float near, float far);
-	Vector3* GetWorldCorner();
+	Vector3* GetWorldCorner(float maxFar);
 	Matrix4x4 GetMatrix_Proj();
 	Matrix4x4 GetMatrix_View();
+	Matrix4x4 GetMatrix_InvView();
 
 	void BeforeRender();
 private:
@@ -46,11 +47,8 @@ private:
 	float _fov;
 	float _aspect;	
 	// Orthographic	
-	float _left;
-	float _right;
-	float _top;
-	float _bottom;
-
+	float _size;
+	
 	Vector3 _worldCorner[8];
 
 	bool _dirtyFlag = false;

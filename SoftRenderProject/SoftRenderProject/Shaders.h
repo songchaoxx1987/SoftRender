@@ -31,12 +31,14 @@ class PSProgramBase
 {
 public:
 	virtual Color Method(Vertex* pVertex, Material* pMat);
+	float AttenShadow(Vertex* pVertex);
 };
 
 class PSBlinPhone :public PSProgramBase
 {
 public:
 	virtual Color Method(Vertex* pVertex, Material* pMat);
+
 };
 
 class Shader
