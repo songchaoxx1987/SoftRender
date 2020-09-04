@@ -33,7 +33,7 @@ Color PSProgramBase::Method(Vertex* pVertex, Material* pMat)
 
 float PSProgramBase::AttenShadow(Vertex* pVertex)
 {
-	return RenderContext::pShadowMap->AttenShadows(pVertex);
+	return RenderContext::pShadowMap->AttenShadow(pVertex);
 }
 
 Vertex* VSBlinPhone::Method(Vertex* pVertex)

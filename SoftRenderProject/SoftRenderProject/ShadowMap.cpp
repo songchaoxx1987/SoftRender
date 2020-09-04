@@ -7,6 +7,7 @@
 #include "Vector3.h"
 #include "Vertex.h"
 #include "RenderContext.h"
+#include "FrameBuffer.h"
 
 #define SHADOWMAP_SIZE 1024
 #define DEFAULT_BIAS 0.005f
@@ -14,14 +15,13 @@
 ShadowMap::ShadowMap()
 {	
 	_pLightCamera = new Camera();
-	_pTexture = new Texture();
-	_pTexture->CreateTexture(SHADOWMAP_SIZE, SHADOWMAP_SIZE, NULL, false);	
+	int flag = SET_FLAG(0, ENUM_FB_MODE::depth);	
+	_pLightCamera->CreateFrameBuffer(SHADOWMAP_SIZE, SHADOWMAP_SIZE, flag);	
 }
 
 ShadowMap::~ShadowMap()
 {
-	SAFE_DELETE(_pLightCamera);
-	SAFE_RELEASE(_pTexture);
+	SAFE_DELETE(_pLightCamera);	
 }
 
 Camera* ShadowMap::InitLightCamera(Camera *pMainCamera, Light* pLight, Scene *pScene)
@@ -36,11 +36,6 @@ Camera* ShadowMap::InitLightCamera(Camera *pMainCamera, Light* pLight, Scene *pS
 	TransformArray(&viewM, pCornerInWorld, cornersInView, 8);
 	Vector3 viewBounds[2];
 	CalcBounds(cornersInView, viewBounds, 8, 1.0f);
-
-	//Vector3 sceneBounds[2];
-	//TransformArray(&viewM, pScene->m_bounds, sceneBounds, 2);
-	//Vector3 sceneBoundsInLightSpace[2];
-	//CalcBounds(sceneBounds, sceneBoundsInLightSpace, 2, 1.0f);
 
 	Vector3 sceneCornersInLightSpace[8];
 	TransformArray(&viewM, pScene->m_corners, sceneCornersInLightSpace, 8);
@@ -59,45 +54,65 @@ Camera* ShadowMap::InitLightCamera(Camera *pMainCamera, Light* pLight, Scene *pS
 	float size = abs(viewBounds[1].y - viewBounds[0].y)/2.0f;
 	float aspect = abs((viewBounds[1].x - viewBounds[0].x) / (viewBounds[1].y - viewBounds[0].y));
 	_pLightCamera->SetOrthoCameraInfo(size, aspect, 0, 1.1f * (sceneBoundsInLightSpace[1].z - sceneBoundsInLightSpace[0].z));
-	//_pLightCamera->SetOrthoCameraInfo(size, aspect, 0, viewBounds[1].z - viewBounds[0].z);
-	auto view = _pLightCamera->GetMatrix_View();
-	auto proj = _pLightCamera->GetMatrix_Proj();
+	_pLightCamera->BeforeRender();
 	return _pLightCamera;
 }
 
-float ShadowMap::AttenShadows(Vertex* pVertex)
+float ShadowMap::AttenShadow(Vertex* pVertex)
 {
 	Light* pLight = (*RenderContext::m_pLights)[0];
 	auto lightDir = pLight->InvDir();
 	float dot = Vector3::Dot(pVertex->normal, lightDir);
 	if (dot < 0)
 		return 1.0f;
-	float bias = max(0.05f * (1.0f - dot), DEFAULT_BIAS);
-	auto pos = m_lightVp.mul(pVertex->worldPos);
-	int u = (int)((pos.x + 1) * _pTexture->width * 0.5f + 0.5f);
-	int v = (int)((1 - pos.y) * _pTexture->height * 0.5f + 0.5f);
-	float realZ = ShadowMap::zInShadowMap(pos.z) - bias;	
+	float bias = max(0.05f * (1.0f - dot), DEFAULT_BIAS);	
+	auto pos = _pLightCamera->GetMatrix_VP().mul(pVertex->worldPos);
+
+	auto pFB = _pLightCamera->GetFrameBuffer();
+	int w = pFB->width();
+	int h = pFB->height();
+		
+	int u = (int)((pos.x + 1) * w * 0.5f + 0.5f);
+	int v = (int)((1 - pos.y) * h * 0.5f + 0.5f);
+	//float realZ = ShadowMap::zInShadowMap(pos.z) - bias;	
+	float realZ = pos.z + bias;
 
 #ifdef  ENABLE_SHADOWMAP_PCF
 	int total = 0;
 	int inshadows = 0;
-	for (int fu = u - 1; fu < u + 1 && fu < _pTexture->width; ++fu)
+	for (int fu = u - 1; fu < u + 1 && fu < w; ++fu)
 	{
-		for (int fv = v - 1; fv < v + 1 && fv < _pTexture->height; ++fv)
+		for (int fv = v - 1; fv < v + 1 && fv < h; ++fv)
 		{
-			++total;
-			if (_pTexture->textureData[fu][fv].r < realZ)
+			++total;			
+			//if (ShadowMap::zInShadowMap(pFB->depth(fu,fv)) < realZ)
+			if (pFB->depth(fu, fv) > realZ)
 				++inshadows;
 		}
 	}
 	return Clamp<float>((1.0 - (float)inshadows / (float)total), 0.2f, 1.0f);
-#else
-	return _pTexture->textureData[u][v].r < realZ ? 0.2f : 1.0f;
+#else	
+	//return ShadowMap::zInShadowMap(pFB->depth(u, v)) < realZ ? 0.2f : 1.0f;
+	return pFB->depth(u, v) > realZ ? 0.2f : 1.0f;
 #endif //  ENABLE_SHADOWMAP_PCF
 }
 
 void ShadowMap::SaveShadowMap2PNG(std::string file)
 {
-	_pTexture->SavePng(file);
+	auto pFP = _pLightCamera->GetFrameBuffer();
+	Texture tex;
+	Color c = Color(1.0f, 1.0f, 1.0f, 1.0f);
+	tex.CreateTexture(pFP->width(), pFP->height(), &c, false);
+	for (int y = 0; y < pFP->height(); ++y)
+	{
+		for (int x = 0; x < pFP->width(); ++x)
+		{
+			float z = zInShadowMap(pFP->depth(x, y));
+			tex.textureData[x][y].r = z;
+			tex.textureData[x][y].g = z;
+			tex.textureData[x][y].b = z;
+		}
+	}
+	tex.SavePng(file);
 }
 

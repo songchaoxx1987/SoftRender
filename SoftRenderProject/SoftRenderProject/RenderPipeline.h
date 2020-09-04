@@ -1,6 +1,5 @@
 #pragma once
 #include "define.h"
-#include "Vertex.h"
 
 
 class CDevice;
@@ -9,35 +8,21 @@ class ShadowMap;
 class Material;
 class RenderObject;
 class Trangle;
-
-enum RenderMode
-{
-	forward = 0,
-	deferred,
-	shadowmap,
-};
+class Camera;
+class Vertex;
+struct Color;
 
 class RenderPipeline
 {
 public:
-	void virtual Render(Scene* pScene, CDevice* pDevice, UINT32 bgColor);
-	void virtual RasterizeTrangle(Trangle* pTrangle, Material* pMat, int w, int h, RenderMode mode);
+	void Render(Scene* pScene, CDevice* pDevice, Color* pBGColor);
 protected:
-	void RenderPass(RENDER_LIST* pRenderList);
-	void virtual Draw(Vertex* pVerTex, Material* pMat) = 0;
+	void RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera);
+	void RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera* pCamera);
 	bool CVVCheck(Vertex* pVertex);
-	void RenderShadowPass(RENDER_LIST* pRenderList, ShadowMap* shadowMap);
 };
 
-class ForWardRenderPipeline :public RenderPipeline
-{
-public:
-	//void virtual Render(Scene* pScene, CDevice* pDevice, UINT32 bgColor);
-protected:
-	void virtual Draw(Vertex* pVerTex, Material* pMat);
 
-	
-};
 
 
 

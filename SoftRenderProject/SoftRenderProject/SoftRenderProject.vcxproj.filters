@@ -19,6 +19,9 @@
     <Filter Include="Util">
       <UniqueIdentifier>{22da423f-5d95-4ad5-9d7e-1660ce069d52}</UniqueIdentifier>
     </Filter>
+    <Filter Include="3rd">
+      <UniqueIdentifier>{803cdb4c-37c9-49e7-b572-956d7cb43c38}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -97,7 +100,10 @@
       <Filter>game3D</Filter>
     </ClInclude>
     <ClInclude Include="ShadowMap.h">
-      <Filter>头文件</Filter>
+      <Filter>game3D</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBuffer.h">
+      <Filter>game3D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -178,12 +184,15 @@
       <Filter>game3D</Filter>
     </ClCompile>
     <ClCompile Include="ShadowMap.cpp">
-      <Filter>源文件</Filter>
+      <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBuffer.cpp">
+      <Filter>game3D</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="svpng.inc">
-      <Filter>game3D</Filter>
+    <None Include="3rd\svpng.inc">
+      <Filter>3rd</Filter>
     </None>
   </ItemGroup>
 </Project>

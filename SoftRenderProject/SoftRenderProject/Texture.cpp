@@ -89,6 +89,11 @@ void Texture::SetPixel(float u, float v, Color& color)
 	textureData[intu][intv] = color;
 }
 
+UINT32 Texture::GetPixelColor(int x, int y)
+{
+	return textureData[x][y].ToRGB();
+}
+
 void Texture::Release()
 {
 	if (textureData == NULL)
@@ -98,6 +103,7 @@ void Texture::Release()
 		delete[] textureData[i];		
 	}
 	delete[] textureData;
+	textureData = NULL;
 }
 
 void Texture::SavePng(std::string file)

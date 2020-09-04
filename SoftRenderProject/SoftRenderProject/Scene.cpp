@@ -9,6 +9,10 @@ extern CDevice* pDevice;
 void Scene::Init()
 {
 	m_pMainCamera = new Camera();
+	int fbflag = 0;
+	fbflag = SET_FLAG(fbflag, ENUM_FB_MODE::depth);
+	fbflag = SET_FLAG(fbflag, ENUM_FB_MODE::colorBuffer);	
+	m_pMainCamera->CreateFrameBuffer(pDevice->screenWidth, pDevice->screenHeight, fbflag);
 	m_pMainCamera->SetPosition(Vector3(0, 5, 5));
 	m_pMainCamera->SetLookAt(Vector3(0, 4, 4));
 	//m_pMainCamera->m_position = Vector3(0, 0, 5);
@@ -32,10 +36,10 @@ void Scene::Init()
 	pObj->m_transform.scale *= 6;
 	//pObj->m_transform.euler = Vector3(0, 0, 0);
 
-	//pObj = new RenderObject();
-	//pObj->Create("Cube", "m01");
-	//m_renderObjects.push_back(pObj);
-	//pObj->m_transform.position = Vector3(1.5, 0, 0);
+	pObj = new RenderObject();
+	pObj->Create("Cube", "m01");
+	m_renderObjects.push_back(pObj);
+	pObj->m_transform.position = Vector3(1.5, 0, 0);
 	//
 	pObj = new RenderObject();
 	pObj->Create("cow", "cow");
@@ -54,7 +58,7 @@ void Scene::Init()
 	Light* pLight = new Light();
 	pLight->transform.position = Vector3(0, 0, 0);
 	//pLight->transform.euler = Vector3(0, 180, 0);
-	pLight->transform.euler = Vector3(45, 0, 0);
+	pLight->transform.euler = Vector3(45, 45, 0);
 	pLight->mode = LightMode::directLight;
 	pLight->color = Color(0.3f, 0.37f, 0.51f);
 	pLight->castShadow = true;

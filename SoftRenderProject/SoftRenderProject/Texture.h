@@ -19,6 +19,7 @@ public:
 	bool LoadTexture(const char* Path);
 	Color Sample(float u, float v);
 	void SetPixel(float u, float v, Color &color);
+	UINT32 GetPixelColor(int x, int y);
 
 	void CreateTexture(int w, int h, Color *pClr, bool topUv);
 	void ClearTexture(Color* pClr);

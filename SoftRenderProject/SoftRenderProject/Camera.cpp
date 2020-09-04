@@ -2,19 +2,21 @@
 #include "define.h"
 #include "Camera.h"
 #include "math.h"
-
+#include "FrameBuffer.h"
 
 Camera::Camera()
 {
+	_pFrameBuffer = new FrameBuffer();
 }
 
 
 Camera::~Camera()
 {
+	SAFE_RELEASE(_pFrameBuffer);
 }
 
 
-Matrix4x4 Camera::GetMatrix_View()
+const Matrix4x4& Camera::GetMatrix_View()
 {
 	if (!_dirtyFlag)
 		return viewMatrix;
@@ -53,10 +55,10 @@ Matrix4x4 Camera::GetMatrix_View()
 	m[15] = 1;
 
 	viewMatrix = m;
-	return m;	
+	return viewMatrix;
 }
 
-Matrix4x4 Camera::GetMatrix_Proj()
+const Matrix4x4& Camera::GetMatrix_Proj()
 {
 	if (!_dirtyFlag)
 		return projMatrix;
@@ -84,7 +86,7 @@ Matrix4x4 Camera::GetMatrix_Proj()
 		proj[15] = 0.0f;
 	}	
 	projMatrix = proj;
-	return proj;
+	return projMatrix;
 
 }
 
@@ -122,10 +124,19 @@ Matrix4x4 Camera::GetMatrix_InvView()
 	return m;
 }
 
+const Matrix4x4& Camera::GetMatrix_VP()
+{
+	if (!_dirtyFlag)	
+		return vpMatrix;
+	vpMatrix = GetMatrix_Proj() * GetMatrix_View();
+	return vpMatrix;
+}
+
 Vector3* Camera::GetWorldCorner(float maxFar)
 {
-	//if (!_dirtyFlag)
-	//	return _worldCorner;
+	if (!_dirtyFlag && _maxCornerFar == maxFar)
+		return _worldCorner;
+	_maxCornerFar = maxFar;
 	Matrix4x4 m = GetMatrix_InvView();	
 	float tanValue = tan(0.5f * AngleToRad(_fov));
 	Vector3 nearPos;
@@ -182,7 +193,8 @@ void Camera::SetOrthoCameraInfo(float size, float aspect, float nearPlane, float
 	_aspect = aspect;
 	_nearPlane = nearPlane;
 	_farPlane = farPlane;
-	_dirtyFlag = true;
+	_maxCornerFar = farPlane;
+	_dirtyFlag = true;	
 }
 
 void Camera::SetPerspectiveCameraInfo(float fov, float aspect, float nearPlane, float farPlane)
@@ -192,15 +204,22 @@ void Camera::SetPerspectiveCameraInfo(float fov, float aspect, float nearPlane, 
 	_aspect = aspect;
 	_nearPlane = nearPlane;
 	_farPlane = farPlane;
-	_dirtyFlag = true;
+	_maxCornerFar = farPlane;
+	_dirtyFlag = true;	
 }
 
 void Camera::BeforeRender()
 {
 	if (!_dirtyFlag)
 		return;
-	GetMatrix_Proj();
-	GetMatrix_View();
+	GetMatrix_VP();
+	//GetMatrix_Proj();
+	//GetMatrix_View();
 	GetWorldCorner(20);
 	_dirtyFlag = false;
+}
+
+void Camera::CreateFrameBuffer(int w, int h, int flag)
+{
+	_pFrameBuffer->Create(w, h, flag);
 }

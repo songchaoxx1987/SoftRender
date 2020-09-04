@@ -7,15 +7,30 @@
 
 //#define CLAMP(a, min, max) a = std::min(std::max(a,min),max);
 #define SAFE_DELETE(p) if(p){delete p; p = NULL;}
+#define SAFE_DELETE2(p, w) if(p){ for (int i = 0 ; i < w; ++i){ delete[] p[i];} delete[] p; p = NULL;}
 #define SAFE_RELEASE(p) if (p){p->Release(); delete p; p=NULL;}
 
 #define PI 3.1415f
 #define MAX_FLAT 99999
 #define AngleToRad(angle) angle * PI/180.0f
 #define lerp(from, to, t)  to * t + (1 - t) * from
+#define CHECK_FLAG(flag, p) ((1 << (int)p) & flag) > 0
+#define SET_FLAG(flag, p) flag | (1 << (int)p)
+#define CLEAR_FLAG(flag, p) flag & ~(1 << (int)p) 
+
+
+
 #define ENABLE_SHADOWMAP_PCF
 
 typedef unsigned int UINT32;
+
+
+enum ENUM_FB_MODE
+{
+	depth = 0,
+	colorBuffer = 1,
+	gBuffer = 2,
+};
 
 template <typename  T>
 T Clamp(T a, T min, T max)

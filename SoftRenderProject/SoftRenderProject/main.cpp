@@ -66,21 +66,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SOFTRENDERPROJECT));
     
-    UINT32 clearColor = Color::ToRGB(0.19,0.3, 0.47f);
+    Color clearColor = Color(0.19,0.3, 0.47f);
     Scene* pScene = new Scene();
     pScene->Init();
 
-    RenderPipeline* pPipline = new ForWardRenderPipeline();
-
-  /*  pDevice->Clear(clearColor);
-    for (int x = 0; x < 200; ++x)
-    {
-        for (int y = 0; y <255; ++y)
-            pDevice->DrawPiexl(x, y, Color::ToRGB(y/255.0f, 0, 0));
-    }
-
-    pDevice->ApplyToScreen();*/
-
+    RenderPipeline* pPipline = new RenderPipeline();
+      
     MSG msg;
 
     // 主消息循环:
@@ -113,7 +104,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             CTimer::Instance()->deltaTime = dt;
             CTimer::Instance()->timePass += dt;
             pScene->Update(dt);
-            pPipline->Render(pScene, pDevice, clearColor);           
+            pPipline->Render(pScene, pDevice, &clearColor);           
             ++fps;
             tick += cost;
             if (tick >= 1000)

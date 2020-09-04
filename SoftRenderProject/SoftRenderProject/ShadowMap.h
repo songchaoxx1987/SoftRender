@@ -1,13 +1,11 @@
 #pragma once
-#include "Color.h"
+#include "define.h"
 #include "Matrix4x4.h"
 #include <string>
 
 class Light;
 class Camera;
 class Scene;
-class Texture;
-//class Vector3;
 class Vertex;
 
 class ShadowMap
@@ -17,11 +15,6 @@ public:
 	~ShadowMap();
 
 	Camera* InitLightCamera(Camera* pMainCamera, Light* pLight, Scene* pScene);	
-	Texture* GetTexture() 
-	{
-		return _pTexture;	
-	}
-
 	Camera* GetCamera()
 	{
 		return _pLightCamera;
@@ -29,15 +22,15 @@ public:
 
 	static float zInShadowMap(float z)
 	{
+		z = Clamp<float>(z, -1.0f, 1.0f);
 		//return 0.5 * z + 0.5;
 		return 1.0 - 0.5 * (1.0 + z);
 	}
-	float AttenShadows(Vertex* v);
+	float AttenShadow(Vertex* v);
 	Matrix4x4 m_lightVp;
 
 	void SaveShadowMap2PNG(std::string file);
 private:
-	Camera* _pLightCamera;
-	Texture* _pTexture;	
+	Camera* _pLightCamera;	
 };
 
