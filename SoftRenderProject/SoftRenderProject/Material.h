@@ -10,6 +10,14 @@ class Matrix4x4;
 class MaterialConfig
 {
 public :
+	MaterialConfig()
+	{
+		isAlphaBlend = false;
+		isAplhaTest = false;
+		zWrite = true;
+		zTest = true;
+		reciveShadow = true;
+	}
 	std::string texFile;
 	std::string vsProgram;
 	std::string psProgram;
@@ -18,6 +26,7 @@ public :
 	bool isAplhaTest;
 	bool zWrite;
 	bool zTest;
+	bool reciveShadow;
 	bool LoadFromFile(std::string file);	
 };
 
@@ -35,6 +44,7 @@ public:
 	bool isAplhaTest;
 	bool zWrite;
 	bool zTest;
+	bool reciveShadow;
 	//int cullOp;	// 0 ≤ªºÙ≤√ 1 À≥ ±’Î 2 ƒÊ ±’Î 
 
 	Color GetColor(float u, float v);

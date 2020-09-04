@@ -42,7 +42,7 @@ Texture* ResourcesManager::GetTexture(std::string file)
 	pTex->LoadTexture(buffer);
 	pTex->file = file;
 	m_mapTex[file] = pTex;
-	pTex->IncreaseRef();
+	pTex->IncreaseRef();	
 	return pTex;
 }
 
@@ -70,6 +70,7 @@ Material* ResourcesManager::CreateMaterial(std::string matName)
 	pMat->isAplhaTest = pCfg->isAplhaTest;
 	pMat->zWrite = pCfg->zWrite;
 	pMat->zTest = pCfg->zTest;
+	pMat->reciveShadow = pCfg->reciveShadow;
 	pMat->pShader = ShaderLib::Instance()->GetShader(pCfg->vsProgram, pCfg->psProgram);
 	return pMat;
 }

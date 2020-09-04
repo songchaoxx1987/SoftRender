@@ -56,5 +56,6 @@ public:
 	void CalcBounds();
 
 	Vector3 m_bounds[2];
+	Vector3 m_corners[8];
 };
 

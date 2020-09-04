@@ -30,7 +30,7 @@ public:
 class PSProgramBase
 {
 public:
-	virtual Color Method(Vertex* pVertex, Material* pMat);
+	virtual Color Method(Vertex* pVertex, Material* pMat);	
 	float AttenShadow(Vertex* pVertex);
 };
 

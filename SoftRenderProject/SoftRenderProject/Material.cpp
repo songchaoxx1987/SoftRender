@@ -50,6 +50,10 @@ bool MaterialConfig::LoadFromFile(std::string file)
 		{
 			zTest = atoi(temp[1].c_str()) > 0;
 		}
+		else if (key == "reciveShadow")
+		{
+			reciveShadow = atoi(temp[1].c_str()) > 0;
+		}
 		else if (key == "vs")
 		{
 			vsProgram = temp[1];
@@ -58,6 +62,7 @@ bool MaterialConfig::LoadFromFile(std::string file)
 		{
 			psProgram = temp[1];
 		}
+		
 	}
 	stream.close();
 	if (vsProgram.empty())
@@ -77,6 +82,7 @@ Material::Material()
 	zWrite = true;
 	zTest = true;
 	pShader = NULL;
+	reciveShadow = true;
 }
 
 Material::~Material()
@@ -96,7 +102,11 @@ Color Material::ApplyPS(Vertex* pVex)
 {
 	if (!pShader || !pShader->pPSProgram)
 		return GetColor(pVex->uv.x, pVex->uv.y);
-	return pShader->pPSProgram->Method(pVex, this) * (1.0f - pShader->pPSProgram->AttenShadow(pVex));
+	auto ret = pShader->pPSProgram->Method(pVex, this);
+	float shadow = 1.0f;
+	if (reciveShadow)
+		shadow = pShader->pPSProgram->AttenShadow(pVex);
+	return ret * shadow;
 }
 
 Vertex* Material::ApplyVS(Vertex* pVex)

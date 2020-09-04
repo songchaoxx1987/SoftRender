@@ -58,7 +58,7 @@ void CDevice::Clear(UINT32 color)
 		for (int x = 0; x < screenWidth; ++x)
 		{
 			frameBuffer[y][x] = color;
-			zBuffer[y][x] = MAX_FLAT; 
+			zBuffer[y][x] = -MAX_FLAT; 
 		}
 		
 	}

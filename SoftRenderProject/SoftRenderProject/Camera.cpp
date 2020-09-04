@@ -76,8 +76,10 @@ Matrix4x4 Camera::GetMatrix_Proj()
 		float tanValue = tan(0.5f * AngleToRad(_fov));
 		proj[0] = -1.0f / (tanValue * _aspect);	// 因为是摄像机是朝向-z，所以这里有负号
 		proj[5] = -1.0f / (tanValue);
-		proj[10] = -(_nearPlane + _farPlane) / (_nearPlane - _farPlane);
-		proj[11] = -2*_nearPlane *_farPlane/(_nearPlane - _farPlane);
+		//proj[10] = -(_nearPlane + _farPlane) / (_nearPlane - _farPlane);
+		//proj[11] = -2*_nearPlane *_farPlane/(_nearPlane - _farPlane);
+		proj[10] = -(_nearPlane + _farPlane) / (_farPlane - _nearPlane);
+		proj[11] = -2*_nearPlane *_farPlane/(_farPlane - _nearPlane);
 		proj[14] = 1.0f;
 		proj[15] = 0.0f;
 	}	
@@ -122,8 +124,8 @@ Matrix4x4 Camera::GetMatrix_InvView()
 
 Vector3* Camera::GetWorldCorner(float maxFar)
 {
-	if (!_dirtyFlag)
-		return _worldCorner;
+	//if (!_dirtyFlag)
+	//	return _worldCorner;
 	Matrix4x4 m = GetMatrix_InvView();	
 	float tanValue = tan(0.5f * AngleToRad(_fov));
 	Vector3 nearPos;
@@ -199,6 +201,6 @@ void Camera::BeforeRender()
 		return;
 	GetMatrix_Proj();
 	GetMatrix_View();
-	GetWorldCorner(10);
+	GetWorldCorner(20);
 	_dirtyFlag = false;
 }

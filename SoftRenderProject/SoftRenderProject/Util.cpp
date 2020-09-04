@@ -37,7 +37,7 @@ void TransformArray(Matrix4x4* pM, Vector3* pVArray, Vector3* ret, int size)
 	}
 }
 
-void CalcBounds(Vector3* pCorners, Vector3* ret, int size)
+void CalcBounds(Vector3* pCorners, Vector3* ret, int size, float scale)
 {
 	ret[0].x = ret[0].y = ret[0].z = MAX_FLAT;
 	ret[1].x = ret[1].y = ret[1].z = -MAX_FLAT;
@@ -46,4 +46,6 @@ void CalcBounds(Vector3* pCorners, Vector3* ret, int size)
 		ret[0] = Vector3::Min(pCorners[i], ret[0]);
 		ret[1] = Vector3::Max(pCorners[i], ret[1]);
 	}
+	ret[0] = ret[0] * scale;
+	ret[1] = ret[1] * scale;
 }

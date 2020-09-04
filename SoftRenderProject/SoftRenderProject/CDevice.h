@@ -16,7 +16,8 @@ public:
 
     bool ZTest(int x, int y, float z)
     {
-        return zBuffer[y][x] >= z;
+        //return zBuffer[y][x] >= z;
+        return zBuffer[y][x] <= z;
     }
 
     void ZWrite(int x, int y, float z)

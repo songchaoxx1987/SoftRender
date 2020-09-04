@@ -11,6 +11,9 @@
 #include "Scene.h"
 #include "RenderPipeline.h"
 
+#include "RenderContext.h"
+#include "ShadowMap.h"
+
 #define APPDIR_LEN 256
 #define MAX_LOADSTRING 100
 
@@ -231,6 +234,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     //    break;
     case WM_DESTROY:
         PostQuitMessage(0);
+        break;
+    case WM_KEYDOWN:
+        if (wParam == VK_UP)
+        {
+            RenderContext::pShadowMap->SaveShadowMap2PNG("e:\\sm.png");
+        }
         break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);

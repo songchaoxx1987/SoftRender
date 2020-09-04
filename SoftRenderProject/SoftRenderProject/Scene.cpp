@@ -21,7 +21,7 @@ void Scene::Init()
 	pObj->Create("Cube", "m02");
 	pObj->enableMove = true;
 	pObj->m_transform.position = Vector3(0, 0, 0);
-	//pObj->m_transform.euler = Vector3(0, 30, 0);
+	//pObj->m_transform.euler = Vector3(0, 1125.45923, 0);
 	m_renderObjects.push_back(pObj);
 
 
@@ -32,11 +32,11 @@ void Scene::Init()
 	pObj->m_transform.scale *= 6;
 	//pObj->m_transform.euler = Vector3(0, 0, 0);
 
-	pObj = new RenderObject();
-	pObj->Create("Cube", "m01");
-	m_renderObjects.push_back(pObj);
-	pObj->m_transform.position = Vector3(1.5, 0, 0);
-	
+	//pObj = new RenderObject();
+	//pObj->Create("Cube", "m01");
+	//m_renderObjects.push_back(pObj);
+	//pObj->m_transform.position = Vector3(1.5, 0, 0);
+	//
 	pObj = new RenderObject();
 	pObj->Create("cow", "cow");
 	pObj->m_transform.position = Vector3(-1.5, 0, 0);
@@ -54,7 +54,7 @@ void Scene::Init()
 	Light* pLight = new Light();
 	pLight->transform.position = Vector3(0, 0, 0);
 	//pLight->transform.euler = Vector3(0, 180, 0);
-	pLight->transform.euler = Vector3(45, 45, 0);
+	pLight->transform.euler = Vector3(45, 0, 0);
 	pLight->mode = LightMode::directLight;
 	pLight->color = Color(0.3f, 0.37f, 0.51f);
 	pLight->castShadow = true;
@@ -108,4 +108,36 @@ void Scene::CalcBounds()
 		m_bounds[0] = Vector3::Min(pObj->m_bounds[0], m_bounds[0]);
 		m_bounds[1] = Vector3::Max(pObj->m_bounds[1], m_bounds[1]);
 	}
+
+	m_corners[0].x = m_bounds[0].x;
+	m_corners[0].y = m_bounds[1].y;
+	m_corners[0].z = m_bounds[1].z;
+
+	m_corners[1].x = m_bounds[1].x;
+	m_corners[1].y = m_bounds[1].y;
+	m_corners[1].z = m_bounds[1].z;
+
+	m_corners[2].x = m_bounds[1].x;
+	m_corners[2].y = m_bounds[0].y;
+	m_corners[2].z = m_bounds[1].z;
+
+	m_corners[3].x = m_bounds[0].x;
+	m_corners[3].y = m_bounds[0].y;
+	m_corners[3].z = m_bounds[1].z;
+
+	m_corners[4].x = m_bounds[0].x;
+	m_corners[4].y = m_bounds[1].y;
+	m_corners[4].z = m_bounds[0].z;
+
+	m_corners[5].x = m_bounds[1].x;
+	m_corners[5].y = m_bounds[1].y;
+	m_corners[5].z = m_bounds[0].z;
+
+	m_corners[6].x = m_bounds[1].x;
+	m_corners[6].y = m_bounds[0].y;
+	m_corners[6].z = m_bounds[0].z;
+
+	m_corners[7].x = m_bounds[0].x;
+	m_corners[7].y = m_bounds[0].y;
+	m_corners[7].z = m_bounds[0].z;
 }

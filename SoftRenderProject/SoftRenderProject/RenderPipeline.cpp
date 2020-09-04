@@ -77,6 +77,9 @@ void RenderPipeline::RenderPass(RENDER_LIST* pRenderList)
 			{
 				// mvp
 				t.v[j] = pObj->m_pMesh->m_pVextexs[i + j];			
+				//auto v1 = m2w.mul(t.v[j].position);
+				//auto v2 = RenderContext::pView->mul(v1);				
+				//auto v3 = RenderContext::pProj->mul(v2);
 				t.v[j].worldPos = RenderContext::pM2W->mul(t.v[j].position);	// worldPos
 				pObj->m_pMaterial->ApplyVS(&t.v[j]);				
 				// 透视除法
@@ -117,7 +120,7 @@ void RenderPipeline::RenderShadowPass(RENDER_LIST* pRenderList, ShadowMap* shado
 	std::vector<Trangle> trangles;
 	int w = shadowMap->GetTexture()->width;
 	int h = shadowMap->GetTexture()->height;
-	shadowMap->GetTexture()->ClearTexture(&Color(-MAX_FLAT, 0, 0));
+	shadowMap->GetTexture()->ClearTexture(&Color(1.0, 1.0, 1.0));	
 	for (RENDER_LIST::iterator it = pRenderList->begin(); it != pRenderList->end(); ++it)
 	{
 		trangles.clear();
@@ -132,6 +135,7 @@ void RenderPipeline::RenderShadowPass(RENDER_LIST* pRenderList, ShadowMap* shado
 			{
 				// mvp
 				t.v[j] = pObj->m_pMesh->m_pVextexs[i + j];
+				t.v[j].worldPos = m2w.mul(t.v[j].position);	// worldPos
 				auto v1 = m2w.mul(t.v[j].position);
 				auto v2 = view.mul(v1);
 				auto v3 = proj.mul(v2);
@@ -151,7 +155,7 @@ void RenderPipeline::RenderShadowPass(RENDER_LIST* pRenderList, ShadowMap* shado
 			if (!drop)
 				trangles.push_back(t);
 		}
-
+				
 		// 绘制三角形		
 		for (int i = 0; i < trangles.size(); ++i)
 		{
@@ -191,9 +195,18 @@ void RenderPipeline::RasterizeTrangle(Trangle* pTrangle, Material* pMat, int w, 
 	int minY = pTrangle->bounds[0].y;
 	int maxY = pTrangle->bounds[1].y;
 
-	float oneDivZ0 = 1.0f / pTrangle->v[0].position.z;
-	float oneDivZ1 = 1.0f / pTrangle->v[1].position.z;
-	float oneDivZ2 = 1.0f / pTrangle->v[2].position.z;
+	float pz0 = pTrangle->v[0].position.z;
+	float pz1 = pTrangle->v[1].position.z;
+	float pz2 = pTrangle->v[2].position.z;
+	if (mode != RenderMode::shadowmap)
+	{
+		pz0 = 1.0f / pz0;
+		pz1 = 1.0f / pz1;
+		pz2 = 1.0f / pz2;
+	}
+	//float oneDivZ0 = 1.0f / pTrangle->v[0].position.z;
+	//float oneDivZ1 = 1.0f / pTrangle->v[1].position.z;
+	//float oneDivZ2 = 1.0f / pTrangle->v[2].position.z;
 
 	int screenHeight = h;
 	int screenWidth = w;
@@ -213,19 +226,16 @@ void RenderPipeline::RasterizeTrangle(Trangle* pTrangle, Material* pMat, int w, 
 			float c3 = Vector2::Cross(ca, cp);
 			if (/*(c1 >= 0 && c2 >= 0 && c3 >= 0) || */(c1 <= 0 && c2 <= 0 && c3 <= 0))
 			{
-			inside = true;
-
-				float lamda1 = (c2 / areaTrangle2) * oneDivZ0;
-				float lamda2 = (c3 / areaTrangle2) * oneDivZ1;
-				float lamda3 = (c1 / areaTrangle2) * oneDivZ2;
-
-				//float lamda1 = abs(c2 / areaTrangle2) * pTrangle->v[0].rhw;
-				//float lamda2 = abs(c3 / areaTrangle2) * pTrangle->v[1].rhw;
-				//float lamda3 = abs(c1 / areaTrangle2) * pTrangle->v[2].rhw;
+				inside = true;
+				float lamda1 = (c2 / areaTrangle2) * pz0;
+				float lamda2 = (c3 / areaTrangle2) * pz1;
+				float lamda3 = (c1 / areaTrangle2) * pz2;
 
 				float rhw = lamda1 + lamda2 + lamda3;
-				float z = 1.0f / rhw;
-
+				float z = rhw;
+				if (mode != RenderMode::shadowmap)
+					z = 1.0 / z;
+				
 				if (mode == RenderMode::forward)
 				{
 					if (pMat->zTest && !RenderContext::pDevice->ZTest(x, y, z))
@@ -236,8 +246,7 @@ void RenderPipeline::RasterizeTrangle(Trangle* pTrangle, Material* pMat, int w, 
 					v.position.z = z;
 					v.uv = LERP(uv);
 					v.normal = LERP(normal);
-					v.worldPos = LERP(worldPos);
-					//v.uv = (pTrangle->v[0].uv * lamda1 + pTrangle->v[1].uv * lamda2 + pTrangle->v[2].uv * lamda3) * z;
+					v.worldPos = LERP(worldPos);					
 					Draw(&v, pMat);
 				}
 				else if (mode == RenderMode::deferred)
@@ -245,9 +254,12 @@ void RenderPipeline::RasterizeTrangle(Trangle* pTrangle, Material* pMat, int w, 
 				else if (mode == RenderMode::shadowmap)
 				{
 					auto shadowTex = RenderContext::pShadowMap->GetTexture();
-					if (shadowTex->textureData[x][y].r > z)
-						continue;
-					shadowTex->textureData[x][y].r = z;
+					float realZ = ShadowMap::zInShadowMap(z);
+					if (shadowTex->textureData[x][y].r < realZ)
+						continue;					
+					shadowTex->textureData[x][y].r = realZ;
+					shadowTex->textureData[x][y].g = 0;
+					shadowTex->textureData[x][y].b = 0;
 				}
 				else
 					return;
@@ -260,92 +272,6 @@ void RenderPipeline::RasterizeTrangle(Trangle* pTrangle, Material* pMat, int w, 
 		}
 	}
 }
-
-
-
-
-
-//void ForWardRenderPipeline::Render(Scene* pScene, CDevice* pDevice, UINT32 bgColor)
-//{	
-//	//pDevice->ClearZBuffer();
-//	pDevice->Clear(bgColor);
-//	pScene->m_pMainCamera->BeforeRender();
-//
-//	RenderContext::m_pLights = &(pScene->m_lights);
-//	RenderContext::pMainCamera = pScene->m_pMainCamera;
-//	RenderContext::pAmbColor = &(pScene->ambLight);
-//	
-//
-//	Matrix4x4 v = pScene->m_pMainCamera->GetMatrix_View();
-//	Matrix4x4 p = pScene->m_pMainCamera->GetMatrix_Proj();
-//	Matrix4x4 vp = p*v ;// pScene->m_pMainCamera->GetMatrix_Proj()* pScene->m_pMainCamera->GetMatrix_View();
-//
-//	RenderContext::pView = &v;
-//	RenderContext::pProj = &p;
-//	RenderContext::pVP = &vp;
-//
-//	std::vector<Trangle> trangles;
-//	//std::vector<int> outIdx;
-//	RENDER_LIST::iterator it = pScene->m_renderObjects.begin();
-//	for (; it != pScene->m_renderObjects.end();++it)
-//	{
-//		trangles.clear();
-//		//outIdx.clear();
-//		RenderObject *pObj = *it;
-//		Matrix4x4 m2w = pObj->m_transform.Local2World();		
-//		Matrix4x4 mvp = vp * m2w;
-//
-//		RenderContext::pM2W = &m2w;
-//		RenderContext::pMVP = &mvp;
-//
-//		for (int i = 0; i < pObj->m_pMesh->m_vextexCnt; i+=3) 
-//		{
-//			Trangle t;
-//			bool drop = false;
-//			for (int j = 0; j < 3; ++j)
-//			{
-//				// mvp
-//				t.v[j] = pObj->m_pMesh->m_pVextexs[i+j];
-//				//auto v1 = m2w.mul(t.v[j].position);
-//				//auto v2 = v.mul(v1);
-//				//auto v3 = p.mul(v2);
-//				//auto v4 = v3 * (1.0f / v3.w);
-//
-//				pObj->m_pMaterial->ApplyVS(&t.v[j]);
-//				//t.v[j].position = mvp.mul(t.v[j].position);
-//
-//				// 透视除法
-//				float reciprocalW = 1.0f / t.v[j].position.w;
-//				t.v[j].position = t.v[j].position * reciprocalW;
-//				//cvv
-//				if (!CVVCheck(&t.v[j]))
-//				{
-//					drop = true;
-//					break;
-//				}						
-//				//视口映射
-//				t.v[j].position.x = (int)((t.v[j].position.x + 1) * pDevice->screenWidth * 0.5f + 0.5f);
-//				t.v[j].position.y = (int)((1 - t.v[j].position.y) * pDevice->screenHeight * 0.5f + 0.5f);
-//				t.v[j].rhw = reciprocalW;
-//			}	
-//			if (!drop)
-//				trangles.push_back(t);			
-//		}
-//
-//
-//		// 绘制三角形
-//		pDevice->pixelCnt = 0;
-//		pDevice->pixelRealCnt = 0;
-//		for (int i = 0; i < trangles.size(); ++i)
-//		{
-//			auto t = &trangles[i];
-//			pDevice->RasterizeTrangle(t, pObj->m_pMaterial, this);
-//		}
-//		//printf("pixelCount: %d pixelRealCnt:%d per: %f\n", pDevice->pixelCnt, pDevice->pixelRealCnt,(float)pDevice->pixelRealCnt /(float)pDevice->pixelCnt);
-//	}
-//	pDevice->ApplyToScreen();
-//}
-
 
 
 void ForWardRenderPipeline::Draw(Vertex* v, Material* pMat)

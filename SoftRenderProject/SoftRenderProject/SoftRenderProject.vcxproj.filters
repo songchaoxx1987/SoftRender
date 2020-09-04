@@ -181,4 +181,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="svpng.inc">
+      <Filter>game3D</Filter>
+    </None>
+  </ItemGroup>
 </Project>
