@@ -1,6 +1,8 @@
 # SoftRender
 
-本工程是学习Games101闫令琪大神的图形学课程之后，针对前五章内容做的练习。实现了前向渲染管线的基本流程，主要包括：mvp变换，blin-phone光照模型，顶点动画，shadowmapping等。
+![alt](screenshot.png)
+
+本工程是学习Games101闫令琪大神的图形学课程之后，针对前五章内容做的练习。实现了前向渲染管线的基本流程，主要包括：mvp变换，blin-phone光照模型，顶点动画，alphablend, alphatest，shadowmapping等。
 
 这个工程只做学习使用，没做任何优化，所以帧率比较吓人。
 
@@ -19,15 +21,15 @@
 ```json
 tex:cow	贴图
 color:1,1,1,1	diffuse color
-alphaTest:0
+alphaTest:0		alphatest开关，1开启，0 关闭。下同
 alphaBlend:0
 zWrite:1
 zTest:1
+alphaClip:0.5	alpha test 裁剪系数
+alphaBlendOp:2,1	alpha blend 混合方式，具体参见material.h中枚举声明
 vs:blin-phone	vertex shader 
 ps:blin-phone	frag shader
 ```
-​	目前alpha相关的功能还没实现，后面有空会加。
-
 2 shader定义
 
 ​	偷懒没有专门的shader语言，用c++生写在shaders.cpp文件中。比较简陋，看一眼就能明白怎么扩展。
@@ -36,7 +38,7 @@ ps:blin-phone	frag shader
 
 ​	res/mesh	mesh目录，目前只支持obj；
 
-​	res/tex	贴图文件目录，目前只支持bmp，后面有空会增加png。
+​	res/tex	贴图文件目录，目前支持bmp和png。
 
 4 场景定义
 
