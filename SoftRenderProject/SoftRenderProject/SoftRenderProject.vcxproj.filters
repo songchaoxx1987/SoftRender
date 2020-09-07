@@ -105,6 +105,9 @@
     <ClInclude Include="FrameBuffer.h">
       <Filter>game3D</Filter>
     </ClInclude>
+    <ClInclude Include="3rd\lodepng.h">
+      <Filter>3rd</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SoftRenderProject.rc">
@@ -188,6 +191,9 @@
     </ClCompile>
     <ClCompile Include="FrameBuffer.cpp">
       <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="3rd\lodepng.cpp">
+      <Filter>3rd</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

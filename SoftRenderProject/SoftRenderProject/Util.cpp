@@ -29,6 +29,22 @@ void split(std::string str, std::vector<std::string>& ret, char delim)
 	}
 }
 
+bool strEndWith(const char* str, int len1, const char* end, int len2)
+{
+	if (len1 < len2)
+		return false;
+	int n = len2;
+	const char* p1 = str + len1 - 1;
+	const char* p2 = end + len2 - 1;
+	while (*p2 == *p1 && n> 0)
+	{
+		--p2;
+		--p1;
+		--n;
+	}
+	return n == 0;
+}
+
 void TransformArray(Matrix4x4* pM, Vector3* pVArray, Vector3* ret, int size)
 {
 	for (int i = 0; i < size; ++i)

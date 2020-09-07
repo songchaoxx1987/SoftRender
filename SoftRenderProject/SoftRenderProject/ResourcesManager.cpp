@@ -38,7 +38,8 @@ Texture* ResourcesManager::GetTexture(std::string file)
 
 	Texture* pTex = new Texture();
 	char buffer[512];
-	sprintf_s(buffer, "%s\\tex\\%s.bmp", resRootPath.c_str(), file.c_str());
+	//sprintf_s(buffer, "%s\\tex\\%s.bmp", resRootPath.c_str(), file.c_str());
+	sprintf_s(buffer, "%s\\tex\\%s", resRootPath.c_str(), file.c_str());
 	pTex->LoadTexture(buffer);
 	pTex->file = file;
 	m_mapTex[file] = pTex;

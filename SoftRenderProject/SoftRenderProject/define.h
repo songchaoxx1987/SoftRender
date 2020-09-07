@@ -50,3 +50,4 @@ typedef std::list<RenderObject*> RENDER_LIST;
 void split(std::string str, std::vector<std::string>& ret, char delim);
 void TransformArray(Matrix4x4* pM, Vector3* pVArray, Vector3* ret, int size);
 void CalcBounds(Vector3* pCorners, Vector3* ret, int size, float scale);
+bool strEndWith(const char* str, int len1, const char* end, int len2);

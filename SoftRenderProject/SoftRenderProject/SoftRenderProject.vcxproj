@@ -149,6 +149,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="3rd\lodepng.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CDevice.h" />
     <ClInclude Include="CMesh.h" />
@@ -178,6 +179,7 @@
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="3rd\lodepng.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CDevice.cpp" />
     <ClCompile Include="CMesh.cpp" />

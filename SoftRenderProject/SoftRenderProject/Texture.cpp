@@ -3,10 +3,18 @@
 #include "Texture.h"
 #include "Color.h"
 #include "svpng.inc"
+#include "lodepng.h"
 
 bool Texture::LoadTexture(const char* path)
 {
-	HBITMAP bitmap = (HBITMAP)LoadImage(NULL, path, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	if (strEndWith(path, strlen(path), ".bmp", 4))
+		return _loadBMP(path);
+	return _loadPNG(path);	
+}
+
+bool Texture::_loadBMP(const char* file)
+{
+	HBITMAP bitmap = (HBITMAP)LoadImage(NULL, file, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 	if (bitmap == NULL)
 		return false;
 	BITMAP bmp;
@@ -26,13 +34,57 @@ bool Texture::LoadTexture(const char* path)
 			int r = color % 256;
 			int g = (color >> 8) % 256;
 			int b = (color >> 16) % 256;
-			float gray = r * 0.299f + g * 0.587f + b * 0.114;			
-			Color c((float)r / 256, (float)g / 256, (float)b / 256, gray/255);
+			float gray = r * 0.299f + g * 0.587f + b * 0.114;
+			Color c((float)r / 256, (float)g / 256, (float)b / 256, gray / 255);
 			textureData[i][j] = c;
 		}
 	}
 	ReleaseDC(NULL, hdc);
 	UV_STARTS_AT_TOP = false;
+	return true;
+}
+
+bool Texture::_loadPNG(const char* file)
+{
+	std::vector<unsigned char> image; //the raw pixels
+	unsigned w, h;
+	unsigned error = lodepng::decode(image, w, h, file);
+	if (error)
+		return false;
+	
+	textureData = new Color * [w];
+	for (int i = 0; i < w; ++i)
+	{
+		textureData[i] = new Color[h];
+	}
+	width = w;
+	height = h;
+	int n = 0;
+	for (int y = 0; y < h; ++y)
+	{
+		for (int x = 0; x < w; ++x)
+		{
+			textureData[x][y].r = (float)image[n++] / 255.0f;
+			textureData[x][y].g = (float)image[n++] / 255.0f;
+			textureData[x][y].b = (float)image[n++] / 255.0f;
+			textureData[x][y].a = (float)image[n++] / 255.0f;
+		}
+	}
+
+	/*textureData = new Color * [w];
+	for (int i = 0; i < w; ++i)
+	{
+		textureData[i] = new Color[h];
+		for (int j = 0 ; j < h ; ++j)
+		{
+			textureData[i][j].r = (float)image[n++]/ 255.0f;
+			textureData[i][j].g = (float)image[n++] /255.0f;
+			textureData[i][j].b = (float)image[n++] / 255.0f;
+			textureData[i][j].a = (float)image[n++] / 255.0f;
+
+		}
+	}*/
+	//UV_STARTS_AT_TOP = true;
 	return true;
 }
 

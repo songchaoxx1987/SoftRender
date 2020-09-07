@@ -43,14 +43,14 @@ void Scene::Init()
 	//
 	pObj = new RenderObject();
 	pObj->Create("cow", "cow");
-	pObj->m_transform.position = Vector3(-1.5, 0, 0);
+	pObj->m_transform.position = Vector3(-1.5, 0, 2);
 	pObj->m_transform.euler = Vector3(0, 180, 0);
 	//pObj->enableMove = true;	
 	m_renderObjects.push_back(pObj);
 
 	pObj = new RenderObject();
 	pObj->Create("cow", "cow2");
-	pObj->m_transform.position = Vector3(-1.5, 0, 2);
+	pObj->m_transform.position = Vector3(1.5, 0, 2);
 	pObj->m_transform.euler = Vector3(0, 180, 0);
 	//pObj->enableMove = true;	
 	m_renderObjects.push_back(pObj);
