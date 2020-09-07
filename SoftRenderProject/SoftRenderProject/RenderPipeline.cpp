@@ -45,7 +45,7 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, Color* pBGColor)
 	for (RENDER_LIST::iterator it = pScene->m_renderObjects.begin(); it != pScene->m_renderObjects.end(); ++it)
 	{
 		RenderObject* pObj = *it;
-		if (pObj->m_pMaterial->isAlphaBlend || pObj->m_pMaterial->isAplhaTest)
+		if (pObj->m_pMaterial->isAlphaBlend || pObj->m_pMaterial->isAlphaTest)
 			alphaList.push_back(pObj);
 		else
 			geometryList.push_back(pObj);
@@ -202,14 +202,20 @@ void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera
 					if (pMat->zWrite)
 						pFB->ZWrite(x, y, z);
 				}
+				
 				if (pFB->isFrameBufferAble())				
-				{
+				{					
 					v.position = p;
 					v.position.z = z;
 					v.uv = LERP(uv);
 					v.normal = LERP(normal);
 					v.worldPos = LERP(worldPos);
-					pFB->GetFrameBuffTex()->textureData[x][y] = pMat->ApplyPS(&v);					
+					Color ret = pMat->ApplyPS(&v);
+					if (pMat->isAlphaTest && pMat->alphaClip > ret.a)
+						continue;
+					if (pMat->isAlphaBlend)					
+						AlphaBlendHandler::AlphaBlendFunction(ret, pFB->GetFrameBuffTex()->textureData[x][y], pMat->srcOp, pMat->destOp, ret);
+					pFB->GetFrameBuffTex()->textureData[x][y] = ret;
 				}				
 			}
 			else

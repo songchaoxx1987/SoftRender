@@ -68,10 +68,13 @@ Material* ResourcesManager::CreateMaterial(std::string matName)
 		pMat->pTexture = GetTexture(pCfg->texFile);
 	pMat->color = pCfg->color;
 	pMat->isAlphaBlend = pCfg->isAlphaBlend;
-	pMat->isAplhaTest = pCfg->isAplhaTest;
+	pMat->isAlphaTest = pCfg->isAlphaTest;
 	pMat->zWrite = pCfg->zWrite;
 	pMat->zTest = pCfg->zTest;
 	pMat->reciveShadow = pCfg->reciveShadow;
+	pMat->alphaClip = pCfg->alphaClip;
+	pMat->srcOp = pCfg->srcOp;
+	pMat->destOp = pCfg->destOp;
 	pMat->pShader = ShaderLib::Instance()->GetShader(pCfg->vsProgram, pCfg->psProgram);
 	return pMat;
 }

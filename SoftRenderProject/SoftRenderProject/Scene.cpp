@@ -34,10 +34,16 @@ void Scene::Init()
 	m_renderObjects.push_back(pObj);
 	pObj->m_transform.position = Vector3(0.5, -1, 0);
 	pObj->m_transform.scale *= 6;
-	//pObj->m_transform.euler = Vector3(0, 0, 0);
 
 	pObj = new RenderObject();
-	pObj->Create("Cube", "m01");
+	pObj->Create("Plane", "grass");
+	m_renderObjects.push_back(pObj);
+	pObj->m_transform.position = Vector3(0, 0, 1.5);
+	pObj->m_transform.scale *= 2;
+	pObj->m_transform.euler = Vector3(90, 0, 0);
+
+	pObj = new RenderObject();
+	pObj->Create("Cube", "blend");
 	m_renderObjects.push_back(pObj);
 	pObj->m_transform.position = Vector3(1.5, 0, 0);
 	//

@@ -36,11 +36,22 @@ bool MaterialConfig::LoadFromFile(std::string file)
 		}
 		else if (key == "alphaTest")
 		{			
-			isAplhaTest = atoi(temp[1].c_str()) > 0;
+			isAlphaTest = atoi(temp[1].c_str()) > 0;
+		}
+		else if (key == "alphaClip")
+		{
+			alphaClip = atof(temp[1].c_str());
 		}
 		else if (key == "alphaBlend")
 		{	
 			isAlphaBlend = atoi(temp[1].c_str()) > 0;
+		}
+		else if (key == "alphaBlendOp")
+		{
+			temp2.clear();
+			split(temp[1], temp2, ',');
+			srcOp = (AlphaBlendOp)atoi(temp2[0].c_str());
+			destOp = (AlphaBlendOp)atoi(temp2[1].c_str());
 		}
 		else if (key == "zWrite")
 		{
@@ -77,7 +88,7 @@ Material::Material()
 {
 	pTexture = NULL;
 	color = Color(1.0, 1.0, 1.0);
-	isAplhaTest = false;
+	isAlphaTest = false;
 	isAlphaBlend = false;
 	zWrite = true;
 	zTest = true;
@@ -114,4 +125,38 @@ Vertex* Material::ApplyVS(Vertex* pVex)
 	if (!pShader || !pShader->pVSProgram)			
 		return pVex;	
 	return pShader->pVSProgram->Method(pVex);
+}
+
+void AlphaBlendHandler::AlphaBlendFunction(Color& src, Color& dest, AlphaBlendOp srcOp, AlphaBlendOp destOp, Color& ret)
+{
+	float p1 = GetAlphaBlendParam(src, dest, srcOp);
+	float p2 = GetAlphaBlendParam(src, dest, destOp);
+	ret = src * p1 + dest * p2;
+}
+
+float AlphaBlendHandler::GetAlphaBlendParam(Color& src, Color& dest, AlphaBlendOp Op)
+{
+	float p1 = 0;
+	switch (Op)
+	{
+	case AlphaBlendOp::zero:
+		p1 = 0;
+		break;
+	case AlphaBlendOp::one:
+		p1 = 1;
+		break;
+	case AlphaBlendOp::src:
+		p1 = src.a;
+		break;
+	case AlphaBlendOp::dest:
+		p1 = dest.a;
+		break;
+	case AlphaBlendOp::oneMinusSrc:
+		p1 = 1 - src.a;
+		break;
+	case AlphaBlendOp::oneMinusDest:
+		p1 = 1 - dest.a;
+		break;
+	}
+	return p1;
 }
