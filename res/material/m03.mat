@@ -4,3 +4,4 @@ alphaTest:0
 alphaBlend:0
 zWrite:1
 zTest:1
+reciveShadow:1
