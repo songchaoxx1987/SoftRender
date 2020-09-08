@@ -9,6 +9,7 @@ public:
 	Vector3 position;
 	Vector3 normal;
 	Vector3 worldPos;
+	Vector3 worldNormal;
 	Color color;
 	Vector2 uv;	
 	Vector3 uv1;

@@ -114,6 +114,10 @@ Color Material::ApplyPS(Vertex* pVex)
 	if (!pShader || !pShader->pPSProgram)
 		return GetColor(pVex->uv.x, pVex->uv.y);
 	auto ret = pShader->pPSProgram->Method(pVex, this);
+#ifdef ENABLE_ADDPASS
+	ret = pShader->pPSProgram->AddPass(pVex, this, ret);
+#endif // ENABLE_ADDPASS
+
 	float shadow = 1.0f;
 	if (reciveShadow)
 		shadow = pShader->pPSProgram->AttenShadow(pVex);

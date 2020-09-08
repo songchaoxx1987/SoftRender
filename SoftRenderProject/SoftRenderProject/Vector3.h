@@ -45,5 +45,8 @@ public:
 	Vector3 static Min(const Vector3& left, const Vector3& right);
 	Vector3 static Max(const Vector3& left, const Vector3& right);
 
+	float static SqrDistance(const Vector3& left, const Vector3& right);
+	float static Distance(const Vector3& left, const Vector3& right);
+
 	void Print();
 };

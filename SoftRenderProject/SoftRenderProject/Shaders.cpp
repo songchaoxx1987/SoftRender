@@ -5,7 +5,7 @@
 #include "Material.h"
 #include "CTimer.h"
 #include "RenderContext.h"
-#include "Scene.h"
+#include "Lights.h"
 #include "Camera.h"
 #include "ShadowMap.h"
 
@@ -49,19 +49,51 @@ Color PSBlinPhone::Method(Vertex* pVertex, Material* pMat)
 	pVertex->normal.Normalize();
 	Light* pLight = (*RenderContext::m_pLights)[0];
 	auto lightDir = pLight->InvDir();
+	//auto lightDir = pLight->Dir();
 
-	float dot = Vector3::Dot(pVertex->normal, lightDir);
-	//Color diffuse = pLight->color * max(0, dot);	// lambert
-	Color diffuse = pLight->color * (0.5f * dot + 1.0f);	// half lambert
+	//float dot = Vector3::Dot(pVertex->normal, lightDir);
+	float dot = Vector3::Dot(pVertex->worldNormal, lightDir);
+	Color diffuse = pLight->color * max(0, dot);	// lambert
+	//Color diffuse = pLight->color * (0.5f * dot + 1.0f);	// half lambert
 	auto viewDir = RenderContext::pMainCamera->Position() - pVertex->worldPos;
 	viewDir.Normalize();
 
 	auto halfDir = viewDir + lightDir;
 	halfDir.Normalize();
 
-	Color spec = pLight->color * pow(max(0, Vector3::Dot(pVertex->normal, halfDir)), 0.5f);	// 2 gloss
+	Color spec = pLight->color * specColor * pow(max(0, Vector3::Dot(pVertex->worldNormal, halfDir)), 128.0f * gloss);	
 
-	return ((*RenderContext::pAmbColor) + diffuse + spec) * pMat->GetColor(pVertex->uv.x, pVertex->uv.y);
+	return ((*RenderContext::pAmbColor) + diffuse) * pMat->GetColor(pVertex->uv.x, pVertex->uv.y) + spec;
+}
+
+Color PSBlinPhone::AddPass(Vertex* pVertex, Material* pMat, Color& baseColor) 
+{
+	Color ret = baseColor;
+	for (int i = 1; i < RenderContext::m_pLights->size(); ++i)
+	{
+		Light* pLight = (*RenderContext::m_pLights)[i];
+		Vector3 lightDir;		
+		if (pLight->mode == LightMode::directLight)		
+			lightDir = pLight->InvDir();
+		else if (pLight->mode == LightMode::pointLight)
+		{
+			lightDir = pLight->transform.position - pVertex->worldPos;
+			lightDir.Normalize();			
+		}
+		float atten = pLight->Atten(pVertex->worldPos);
+		if (atten <= 0.0001f)
+			continue;
+		
+		float dot = Vector3::Dot(pVertex->worldNormal, lightDir);
+		Color diffuse = pLight->color * max(0, dot);	// lambert		
+		auto viewDir = RenderContext::pMainCamera->Position() - pVertex->worldPos;
+		viewDir.Normalize();
+		auto halfDir = viewDir + lightDir;
+		halfDir.Normalize();
+		Color spec = pLight->color * specColor * pow(max(0, Vector3::Dot(pVertex->worldNormal, halfDir)), 128.0f * gloss);
+		ret = ret + (spec + diffuse * pMat->GetColor(pVertex->uv.x, pVertex->uv.y)) * atten;
+	}
+	return ret;
 }
 
 ShaderLib::ShaderLib()

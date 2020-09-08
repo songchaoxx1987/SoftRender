@@ -32,13 +32,16 @@ class PSProgramBase
 public:
 	virtual Color Method(Vertex* pVertex, Material* pMat);	
 	float AttenShadow(Vertex* pVertex);
+	virtual Color AddPass(Vertex* pVertex, Material* pMat, Color& baseColor) { return baseColor; }
 };
 
 class PSBlinPhone :public PSProgramBase
 {
 public:
+	Color specColor = Color(1.0, 1.0, 1.0);
+	float gloss = 1;
 	virtual Color Method(Vertex* pVertex, Material* pMat);
-
+	virtual Color AddPass(Vertex* pVertex, Material* pMat, Color& baseColor);
 };
 
 class Shader

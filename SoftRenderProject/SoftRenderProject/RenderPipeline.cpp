@@ -96,6 +96,7 @@ void RenderPipeline::RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera)
 					float reciprocalW = 1.0f / t.v[j].position.w;
 					t.v[j].position = t.v[j].position * reciprocalW;
 					t.v[j].rhw = reciprocalW;
+					t.v[j].worldNormal = m2w.mul(t.v[j].normal);
 				}
 				else
 				{	
@@ -210,6 +211,7 @@ void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera
 					v.uv = LERP(uv);
 					v.normal = LERP(normal);
 					v.worldPos = LERP(worldPos);
+					v.worldNormal = LERP(worldNormal);
 					Color ret = pMat->ApplyPS(&v);
 					if (pMat->isAlphaTest && pMat->alphaClip > ret.a)
 						continue;

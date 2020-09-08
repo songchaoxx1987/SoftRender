@@ -21,6 +21,7 @@
 
 
 #define ENABLE_SHADOWMAP_PCF
+#define ENABLE_ADDPASS
 
 typedef unsigned int UINT32;
 

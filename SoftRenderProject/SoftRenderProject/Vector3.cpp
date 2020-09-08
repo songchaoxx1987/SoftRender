@@ -89,6 +89,16 @@ Vector3 Vector3::Max(const Vector3& left, const Vector3& right)
 	return ret;
 }
 
+float Vector3::SqrDistance(const Vector3& left, const Vector3& right)
+{
+	return (right.x - left.x) * (right.x - left.x) + (right.y - left.y) * (right.y - left.y) + (right.z - left.z) * (right.z - left.z);
+}
+
+float Vector3::Distance(const Vector3& left, const Vector3& right)
+{
+	return sqrt(SqrDistance(left, right));
+}
+
 Vector3::operator Vector2()
 {
 	Vector2 ret(x,y);

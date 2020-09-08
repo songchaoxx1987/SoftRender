@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "RenderObject.h"
 #include "CDevice.h"
+#include "Lights.h"
 
 extern CDevice* pDevice;
 
@@ -55,24 +56,51 @@ void Scene::Init()
 	m_renderObjects.push_back(pObj);
 
 	pObj = new RenderObject();
-	pObj->Create("cow", "cow2");
+	pObj->Create("cow", "cow");
 	pObj->m_transform.position = Vector3(1.5, 0, 2);
 	pObj->m_transform.euler = Vector3(0, 180, 0);
 	//pObj->enableMove = true;	
 	m_renderObjects.push_back(pObj);
 
-	Light* pLight = new Light();
-	pLight->transform.position = Vector3(0, 0, 0);
-	//pLight->transform.euler = Vector3(0, 180, 0);
+	Light* pLight = NULL;
+	pLight = new Light();
+	pLight->transform.position = Vector3(0, 0, 0);	
 	pLight->transform.euler = Vector3(45, 45, 0);
 	pLight->mode = LightMode::directLight;
-	pLight->color = Color(0.3f, 0.37f, 0.51f);
+	pLight->color = Color(0.37f, 0.3f, 0.51f);
 	pLight->castShadow = true;
 	pLight->CalcDir();
-
+	m_lights.push_back(pLight);
+		
+	pLight = new Light();
+	pLight->mode = LightMode::pointLight;
+	pLight->pointLightRange = 10.0f;	
+	pLight->transform.position = Vector3(-3, 1, 3);	
+	pLight->color = Color(0.43f, 1.0f, 0);
 	m_lights.push_back(pLight);
 
-	ambLight = Color(0.2f, 0.2f, 0.2f);
+	pLight = new Light();
+	pLight->mode = LightMode::pointLight;
+	pLight->pointLightRange = 10.0f;
+	pLight->transform.position = Vector3(3, 1, 3);
+	pLight->color = Color(0.81f, 0.11f, 0.25);
+	m_lights.push_back(pLight);
+
+	pLight = new Light();
+	pLight->mode = LightMode::pointLight;
+	pLight->pointLightRange = 10.0f;
+	pLight->transform.position = Vector3(-3, 1, -3);
+	pLight->color = Color(0.04f, 0.69f, 0.90f);
+	m_lights.push_back(pLight);
+
+	pLight = new Light();
+	pLight->mode = LightMode::pointLight;
+	pLight->pointLightRange = 10.0f;
+	pLight->transform.position = Vector3(3, 1, -3);
+	pLight->color = Color(0.991f, 0.80f, 0.04);
+	m_lights.push_back(pLight);
+
+	ambLight = Color(0.21f, 0.22f, 0.25f);
 }
 
 void Scene::Release()

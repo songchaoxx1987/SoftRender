@@ -3,6 +3,7 @@
 #include "define.h"
 #include "Camera.h"
 #include "Scene.h"
+#include "Lights.h"
 #include "Texture.h"
 #include "Vector3.h"
 #include "Vertex.h"
@@ -89,7 +90,7 @@ float ShadowMap::AttenShadow(Vertex* pVertex)
 			if (pFB->depth(fu, fv) > realZ)
 				++inshadows;
 		}
-	}
+	}	
 	return Clamp<float>((1.0 - (float)inshadows / (float)total), 0.2f, 1.0f);
 #else	
 	//return ShadowMap::zInShadowMap(pFB->depth(u, v)) < realZ ? 0.2f : 1.0f;
