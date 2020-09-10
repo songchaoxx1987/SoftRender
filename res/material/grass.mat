@@ -1,8 +1,8 @@
 tex:grass.png
-color:1,1,1,1
+color:0,1,0,1
 alphaClip:0.5
 alphaTest:1
 alphaBlend:0
 zWrite:1
 zTest:1
-reciveShadow:1
+reciveShadow:0

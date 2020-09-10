@@ -9,6 +9,7 @@
 #include "Vertex.h"
 #include "RenderContext.h"
 #include "FrameBuffer.h"
+#include "math.h"
 
 #define SHADOWMAP_SIZE 1024
 #define DEFAULT_BIAS 0.005f
@@ -63,39 +64,26 @@ float ShadowMap::AttenShadow(Vertex* pVertex)
 {
 	Light* pLight = (*RenderContext::m_pLights)[0];
 	auto lightDir = pLight->InvDir();
-	float dot = Vector3::Dot(pVertex->normal, lightDir);
+	float dot = Vector3::Dot(pVertex->worldNormal, lightDir);
 	if (dot < 0)
 		return 1.0f;
-	float bias = max(0.05f * (1.0f - dot), DEFAULT_BIAS);	
+	float bias = max(0.05f * (1.0f - dot), DEFAULT_BIAS);		
 	auto pos = _pLightCamera->GetMatrix_VP().mul(pVertex->worldPos);
 
 	auto pFB = _pLightCamera->GetFrameBuffer();
 	int w = pFB->width();
-	int h = pFB->height();
-		
-	int u = (int)((pos.x + 1) * w * 0.5f + 0.5f);
-	int v = (int)((1 - pos.y) * h * 0.5f + 0.5f);
-	//float realZ = ShadowMap::zInShadowMap(pos.z) - bias;	
-	float realZ = pos.z + bias;
+	int h = pFB->height();	
 
+	float fu = ((pos.x + 1) * w * 0.5f - 0.5f);
+	float fv = ((1 - pos.y) * h * 0.5f - 0.5f);
+	float realZ = pos.z + bias;
+		
 #ifdef  ENABLE_SHADOWMAP_PCF
-	int total = 0;
-	int inshadows = 0;
-	for (int fu = u - 1; fu < u + 1 && fu < w; ++fu)
-	{
-		for (int fv = v - 1; fv < v + 1 && fv < h; ++fv)
-		{
-			++total;			
-			//if (ShadowMap::zInShadowMap(pFB->depth(fu,fv)) < realZ)
-			if (pFB->depth(fu, fv) > realZ)
-				++inshadows;
-		}
-	}	
-	return Clamp<float>((1.0 - (float)inshadows / (float)total), 0.2f, 1.0f);
+	float z = pFB->SampleDepth(fu, fv, true);		
 #else	
-	//return ShadowMap::zInShadowMap(pFB->depth(u, v)) < realZ ? 0.2f : 1.0f;
-	return pFB->depth(u, v) > realZ ? 0.2f : 1.0f;
+	float z = pFB->SampleDepth(fu, fv, false);	
 #endif //  ENABLE_SHADOWMAP_PCF
+	return z > realZ ? zInShadowMap(z) : 1.0f;
 }
 
 void ShadowMap::SaveShadowMap2PNG(std::string file)
@@ -108,7 +96,7 @@ void ShadowMap::SaveShadowMap2PNG(std::string file)
 	{
 		for (int x = 0; x < pFP->width(); ++x)
 		{
-			float z = zInShadowMap(pFP->depth(x, y));
+			float z = zInShadowMap(pFP->SampleDepth(x, y, false));
 			tex.textureData[x][y].r = z;
 			tex.textureData[x][y].g = z;
 			tex.textureData[x][y].b = z;

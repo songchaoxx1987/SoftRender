@@ -19,13 +19,13 @@ Vector3 Vector3::operator-(const Vector3& right)const
 
 Vector3 Vector3::operator * (float value) const
 {
-	Vector3 ret(x * value, y * value, z * value);
+	Vector3 ret(x * value, y * value, z * value, w);
 	return ret;
 }
 
 Vector3 Vector3::operator / (float value) const
 {
-	Vector3 ret(x / value, y / value, z / value);
+	Vector3 ret(x / value, y / value, z / value, w/value);
 	return ret;
 }
 

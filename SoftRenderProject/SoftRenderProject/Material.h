@@ -64,7 +64,7 @@ public:
 	AlphaBlendOp destOp;
 	//int cullOp;	// 0 ≤ªºÙ≤√ 1 À≥ ±’Î 2 ƒÊ ±’Î 
 
-	Color GetColor(float u, float v);
+	Color GetTexColor(float u, float v);
 	Color ApplyPS(Vertex* pVex);
 	Vertex* ApplyVS(Vertex* pVex);
 };

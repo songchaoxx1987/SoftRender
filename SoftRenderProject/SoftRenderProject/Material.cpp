@@ -102,17 +102,17 @@ Material::~Material()
 	pShader = NULL;
 }
 
-Color Material::GetColor(float u, float v)
+Color Material::GetTexColor(float u, float v)
 {
 	if (!pTexture)
 		return Color(1.0f, 1.0f, 1.0f);
-	return (color * pTexture->Sample(u, v));
+	return pTexture->Sample(u, v);
 }
 
 Color Material::ApplyPS(Vertex* pVex)
 {
 	if (!pShader || !pShader->pPSProgram)
-		return GetColor(pVex->uv.x, pVex->uv.y);
+		return GetTexColor(pVex->uv.x, pVex->uv.y) * color;
 	auto ret = pShader->pPSProgram->Method(pVex, this);
 #ifdef ENABLE_ADDPASS
 	ret = pShader->pPSProgram->AddPass(pVex, this, ret);

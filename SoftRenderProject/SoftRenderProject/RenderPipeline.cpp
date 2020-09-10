@@ -39,7 +39,7 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, Color* pBGColor)
 	RenderContext::pProj = &p;
 	RenderContext::pVP = &vp;	
 
-	RENDER_LIST geometryList;
+	RENDER_LIST geometryList;	
 	RENDER_LIST alphaList;
 
 	for (RENDER_LIST::iterator it = pScene->m_renderObjects.begin(); it != pScene->m_renderObjects.end(); ++it)
@@ -48,7 +48,9 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, Color* pBGColor)
 		if (pObj->m_pMaterial->isAlphaBlend || pObj->m_pMaterial->isAlphaTest)
 			alphaList.push_back(pObj);
 		else
-			geometryList.push_back(pObj);
+		{
+			geometryList.push_back(pObj);			
+		}
 	}
 	
 	RenderContext::pMainCamera->GetFrameBuffer()->Clear(pBGColor->r, pBGColor->g, pBGColor->b, pBGColor->a, -MAX_FLAT);
@@ -210,8 +212,11 @@ void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera
 					v.position.z = z;
 					v.uv = LERP(uv);
 					v.normal = LERP(normal);
+					v.normal.Normalize();
 					v.worldPos = LERP(worldPos);
+					v.worldPos.w = 1.0f;
 					v.worldNormal = LERP(worldNormal);
+					v.worldNormal.Normalize();
 					Color ret = pMat->ApplyPS(&v);
 					if (pMat->isAlphaTest && pMat->alphaClip > ret.a)
 						continue;

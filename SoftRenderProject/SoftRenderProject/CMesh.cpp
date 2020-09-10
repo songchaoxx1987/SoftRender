@@ -37,6 +37,7 @@ void CMesh::LoadFromFile(const char* file)
 			pos.x = atof(temp[1].c_str());
 			pos.y = atof(temp[2].c_str());
 			pos.z = atof(temp[3].c_str());
+			pos.w = 1;
 			positions.push_back(pos);
 			//pos.Print();
 		}
@@ -46,6 +47,7 @@ void CMesh::LoadFromFile(const char* file)
 			n.x = atof(temp[1].c_str());
 			n.y = atof(temp[2].c_str());
 			n.z = atof(temp[3].c_str());
+			n.w = 0;
 			normals.push_back(n);
 			//n.Print();
 		}

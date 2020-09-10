@@ -37,7 +37,7 @@ public:
 			m_zBuffer[y][x] = z;
 	}
 
-	float depth(int x, int y) { return m_zBuffer[y][x]; }
+	float SampleDepth(float u, float v, bool bilinear);
 
 	float width() { return m_width; }
 	float height() { return m_height; }
@@ -45,7 +45,10 @@ public:
 	bool isFrameBufferAble() { return m_pFrameBuffer != NULL; }
 	bool isGBufferAble() { return m_pGBuffer != NULL; }
 	bool isDepthAble() { return m_zBuffer != NULL; }
-
+	bool OnlyDep() 
+	{
+		return isDepthAble() && !isFrameBufferAble();
+	}
 	Texture* GetFrameBuffTex() { return m_pFrameBuffer; }
 protected:
 	float m_width;

@@ -28,7 +28,7 @@ Vertex* VSWave::Method(Vertex* pVertex)
 
 Color PSProgramBase::Method(Vertex* pVertex, Material* pMat)
 {	
-	return pMat->GetColor(pVertex->uv.x, pVertex->uv.y);
+	return pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y) * pMat->color;
 }
 
 float PSProgramBase::AttenShadow(Vertex* pVertex)
@@ -39,19 +39,16 @@ float PSProgramBase::AttenShadow(Vertex* pVertex)
 Vertex* VSBlinPhone::Method(Vertex* pVertex)
 {
 	pVertex->worldPos = RenderContext::pM2W->mul(pVertex->position);	// worldPos
-	pVertex->position = RenderContext::pMVP->mul(pVertex->position);
-	pVertex->normal = RenderContext::pM2W->mul(pVertex->normal);	
+	pVertex->position = RenderContext::pMVP->mul(pVertex->position);	
 	return pVertex;
 }
 
 Color PSBlinPhone::Method(Vertex* pVertex, Material* pMat)
-{
-	pVertex->normal.Normalize();
+{	
 	Light* pLight = (*RenderContext::m_pLights)[0];
 	auto lightDir = pLight->InvDir();
 	//auto lightDir = pLight->Dir();
 
-	//float dot = Vector3::Dot(pVertex->normal, lightDir);
 	float dot = Vector3::Dot(pVertex->worldNormal, lightDir);
 	Color diffuse = pLight->color * max(0, dot);	// lambert
 	//Color diffuse = pLight->color * (0.5f * dot + 1.0f);	// half lambert
@@ -63,7 +60,7 @@ Color PSBlinPhone::Method(Vertex* pVertex, Material* pMat)
 
 	Color spec = pLight->color * specColor * pow(max(0, Vector3::Dot(pVertex->worldNormal, halfDir)), 128.0f * gloss);	
 
-	return ((*RenderContext::pAmbColor) + diffuse) * pMat->GetColor(pVertex->uv.x, pVertex->uv.y) + spec;
+	return ((*RenderContext::pAmbColor) + diffuse) * pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y) * pMat->color + spec;
 }
 
 Color PSBlinPhone::AddPass(Vertex* pVertex, Material* pMat, Color& baseColor) 
@@ -91,7 +88,7 @@ Color PSBlinPhone::AddPass(Vertex* pVertex, Material* pMat, Color& baseColor)
 		auto halfDir = viewDir + lightDir;
 		halfDir.Normalize();
 		Color spec = pLight->color * specColor * pow(max(0, Vector3::Dot(pVertex->worldNormal, halfDir)), 128.0f * gloss);
-		ret = ret + (spec + diffuse * pMat->GetColor(pVertex->uv.x, pVertex->uv.y)) * atten;
+		ret = ret + (spec + diffuse * pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y)) * pMat->color * atten;
 	}
 	return ret;
 }

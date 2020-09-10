@@ -99,3 +99,28 @@ void FrameBuffer::ApplyToDevice(CDevice* pDevice)
 		}
 	}
 }
+
+float FrameBuffer::SampleDepth(float u, float v, bool bilinear)
+{
+	int x = (int)u;
+	int y = (int)v;
+	if (bilinear)
+	{
+		float fx = u - x;
+		float fy = v - y;
+
+		int dy = min(y + 1, m_height);
+		int dx = min(x + 1, m_width);
+
+		float z0 = m_zBuffer[y][x];
+		float z1 = m_zBuffer[y][dx];
+		float z2 = m_zBuffer[dy][x];
+		float z3 = m_zBuffer[dy][dx];
+
+		float a = lerp(z0, z1, fx);
+		float b = lerp(z2, z3, fx);
+		float c = lerp(a, b, fy);
+		return c;
+	}
+	return m_zBuffer[y][x];
+}
