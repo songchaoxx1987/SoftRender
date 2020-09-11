@@ -7,7 +7,7 @@
 class Vertex;
 class Matrix4x4;
 class Material;
-
+class Light;
 
 class VSProgramBase
 {
@@ -42,6 +42,17 @@ public:
 	float gloss = 1;
 	virtual Color Method(Vertex* pVertex, Material* pMat);
 	virtual Color AddPass(Vertex* pVertex, Material* pMat, Color& baseColor);
+
+	Color LightFunction(Light* pLight, Vertex* pVex, const Color& diffuseColor);
+};
+
+class HalfLambertDiffuse :public PSProgramBase
+{
+public:	
+	virtual Color Method(Vertex* pVertex, Material* pMat);
+	virtual Color AddPass(Vertex* pVertex, Material* pMat, Color& baseColor);
+
+	Color LightFunction(Light* pLight, Vertex* pVex);
 };
 
 class Shader

@@ -13,11 +13,18 @@ enum LightMode
 class Light
 {
 public:
+	Light() 
+	{
+		pointLightRange = 10;
+		castShadow = false;
+		intensity = 1.0f;
+	}
 	Transform transform;
 	Color color;
 	LightMode mode;
 	float pointLightRange;
 	bool castShadow;
+	float intensity;
 	void CalcDir()
 	{
 		if (mode == LightMode::directLight)
