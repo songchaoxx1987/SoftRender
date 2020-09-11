@@ -141,6 +141,126 @@ bool RenderPipeline::CVVCheck(Vertex* pVertex)
 	return true;
 }
 
+
+
+void RenderPipeline::RenderAPassWithCVV(RENDER_LIST* pRenderList, Camera* pCamera)
+{
+	const Vector3 NDC_PLANES[6] = 
+	{
+		Vector3(0,0,1,-1),	// n
+		Vector3(0,0,-1,-1),	// f
+		Vector3(0,1,0,-1),	// t
+		Vector3(0,-1,0,-1),	// b
+		Vector3(1,0,0,-1),	// r
+		Vector3(-1,0,0,-1)	// l
+	};
+	// 过点p的 平面方程 A*x+B*y+C*z+D=0, 法向量 N = (a,b,c) d = -(n * p) 
+	// 对应点 Q ,d = N*Q + D ,d < 0 Q在法线负侧 d > 0 Q在法线正侧
+	// 我们约定NDC空间，法线都是沿坐标轴向外的，w存储D值
+
+	auto pFB = pCamera->GetFrameBuffer();
+	float w = pFB->width();
+	float h = pFB->height();
+
+	std::vector<Trangle> trangles;
+	std::vector<Vertex> inputVertexs;
+	for (RENDER_LIST::iterator it = pRenderList->begin(); it != pRenderList->end(); ++it)
+	{
+		trangles.clear();
+		RenderObject* pObj = *it;
+		Matrix4x4 m2w = pObj->m_transform.Local2World();
+		Matrix4x4 mvp = pCamera->GetMatrix_VP() * m2w;
+		RenderContext::pM2W = &m2w;
+		RenderContext::pMVP = &mvp;
+
+		for (int i = 0; i < pObj->m_pMesh->m_vextexCnt; i += 3)
+		{			
+			inputVertexs.clear();
+			for (int j = 0; j < 3; ++j)
+			{
+				Vertex v = pObj->m_pMesh->m_pVextexs[i + j];
+				if (pFB->isFrameBufferAble())
+				{
+					v.worldPos = m2w.mul(v.position);	// worldPos			
+					v.worldNormal = m2w.mul(v.normal);	// worldNormal
+
+					pObj->m_pMaterial->ApplyVS(&v);
+					// 透视除法
+					float reciprocalW = 1.0f / v.position.w;
+					v.position = v.position * reciprocalW;
+					v.rhw = reciprocalW;
+				}
+				else
+				{
+					v.position = mvp.mul(v.position);
+					v.rhw = 1.0f;
+				}
+				inputVertexs.push_back(v);
+				//视口映射
+				v.position.x = (int)((v.position.x + 1) * w * 0.5f + 0.5f);
+				v.position.y = (int)((1 - v.position.y) * h * 0.5f + 0.5f);
+			}
+			if (IsAllOutNDC(inputVertexs))
+				continue;
+
+			for (int m = 0; m < 6; ++m)
+			{
+				for (int n = 0; n < 3; ++n)
+				{
+					Vertex& s = inputVertexs[n];
+					Vertex& e = inputVertexs[(n + 1) % 3];
+					if (InsideLine(s.position, NDC_PLANES[i]))
+					{
+						if (!InsideLine(e.position, NDC_PLANES[i]))
+						{
+							Vertex intersect = IntersectNDC(s, e, NDC_PLANES[i]);
+						}
+					}
+					else if (InsideLine(e.position, NDC_PLANES[i]))
+					{ 
+					}
+				}
+			}
+
+		}
+
+		// 绘制三角形		
+		for (int i = 0; i < trangles.size(); ++i)
+		{
+			auto t = &trangles[i];
+			RasterizeATrangle(t, pObj->m_pMaterial, pCamera);
+		}
+	}
+}
+
+bool RenderPipeline::InsideLine(const Vector3& p, const Vector3& line)
+{
+	return line.x * p.x + line.y * p.y + line.z * p.z + line.w * p.w <= 0;
+}
+
+Vertex RenderPipeline::IntersectNDC(const Vertex& s, const Vertex& e, const Vector3& line)
+{
+	// to do 这里需要判断下点是否超出了线段边界
+	float da = s.position.x * line.x + s.position.y * line.y + s.position.z * line.z + line.w * s.position.w;
+	float db = e.position.x * line.x + e.position.y * line.y + e.position.z * line.z + line.w * e.position.w;
+	float weight = da / (da - db);
+	return Vertex::Lerp(s, e, weight);
+}
+
+bool RenderPipeline::IsAllOutNDC(const std::vector<Vertex> &v)
+{
+	for (auto it = v.begin(); it != v.end(); ++it)
+	{
+		const Vertex* pVertex = &(*it);
+		if ((pVertex->position.x >= -1.0f && pVertex->position.x <= 1.0f) && 
+			(pVertex->position.y >= -1.0f && pVertex->position.y <= 1.0f) && 
+			(pVertex->position.z >= -1.0f && pVertex->position.z <= 1.0f)
+			)
+			return false;		
+	}
+	return true;
+}
+
 void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera* pCamera)
 {
 	// 右手坐标系，逆时针	

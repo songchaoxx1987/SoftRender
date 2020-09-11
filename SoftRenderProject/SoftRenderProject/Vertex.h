@@ -12,8 +12,9 @@ public:
 	Vector3 worldNormal;
 	Color color;
 	Vector2 uv;	
-	Vector3 uv1;
-	
+		
 	float rhw;
+
+	static Vertex Lerp(const Vertex& v1, const Vertex& v2, float t);
 };
 
