@@ -14,7 +14,7 @@ void Scene::Init()
 	fbflag = SET_FLAG(fbflag, ENUM_FB_MODE::depth);
 	fbflag = SET_FLAG(fbflag, ENUM_FB_MODE::colorBuffer);	
 	m_pMainCamera->CreateFrameBuffer(pDevice->screenWidth, pDevice->screenHeight, fbflag);
-	m_pMainCamera->SetPosition(Vector3(0, 5, 5));
+	m_pMainCamera->SetPosition(Vector3(0, 3, 4));
 	m_pMainCamera->SetLookAt(Vector3(0, 0, 0));
 	//m_pMainCamera->m_position = Vector3(0, 0, 5);
 	//m_pMainCamera->m_lookAt = Vector3(0, 0, -4);
@@ -50,7 +50,7 @@ void Scene::Init()
 	//
 	pObj = new RenderObject();
 	pObj->Create("cow", "cow");
-	pObj->m_transform.position = Vector3(-1.5, 0, 2);
+	pObj->m_transform.position = Vector3(-1.5, 0, 1);
 	pObj->m_transform.euler = Vector3(0, 180, 0);
 	//pObj->enableMove = true;	
 	m_renderObjects.push_back(pObj);
