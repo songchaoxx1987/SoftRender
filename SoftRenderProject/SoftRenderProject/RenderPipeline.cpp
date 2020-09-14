@@ -64,100 +64,87 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, Color* pBGColor)
 	pDevice->ApplyToScreen();
 }
 
+//void RenderPipeline::RenderAPass2(RENDER_LIST* pRenderList, Camera* pCamera)
+//{
+//	std::vector<Trangle> trangles;
+//	for (RENDER_LIST::iterator it = pRenderList->begin(); it != pRenderList->end(); ++it)
+//	{
+//		trangles.clear();
+//		RenderObject* pObj = *it;
+//		Matrix4x4 m2w = pObj->m_transform.Local2World();		
+//		Matrix4x4 mvp = pCamera->GetMatrix_VP() * m2w;
+//
+//		RenderContext::pM2W = &m2w;
+//		RenderContext::pMVP = &mvp;
+//
+//		auto pFB = pCamera->GetFrameBuffer();
+//
+//		for (int i = 0; i < pObj->m_pMesh->m_vextexCnt; i += 3)
+//		{
+//			Trangle t;
+//			bool drop = false;
+//			for (int j = 0; j < 3; ++j)
+//			{
+//				// mvp
+//				t.v[j] = pObj->m_pMesh->m_pVextexs[i + j];
+//				t.v[j].worldPos = m2w.mul(t.v[j].position);	// worldPos
+//				//auto v1 = m2w.mul(t.v[j].position);
+//				//auto v2 = RenderContext::pView->mul(v1);				
+//				//auto v3 = RenderContext::pProj->mul(v2);
+//				if (pFB->isFrameBufferAble())
+//				{					
+//					pObj->m_pMaterial->ApplyVS(&t.v[j]);
+//					// 透视除法
+//					float reciprocalW = 1.0f / t.v[j].position.w;
+//					t.v[j].position = t.v[j].position * reciprocalW;
+//					t.v[j].rhw = reciprocalW;
+//					t.v[j].worldNormal = m2w.mul(t.v[j].normal);
+//				}
+//				else
+//				{	
+//					t.v[j].position = mvp.mul(t.v[j].position);
+//					t.v[j].rhw = 1.0f;
+//				}
+//				//cvv
+//				if (!CVVCheck(&t.v[j]))
+//				{
+//					drop = true;
+//					break;
+//				}
+//				//视口映射
+//				t.v[j].position.x = (int)((t.v[j].position.x + 1) * pFB->width() * 0.5f + 0.5f);
+//				t.v[j].position.y = (int)((1 - t.v[j].position.y) * pFB->height() * 0.5f + 0.5f);
+//				
+//			}
+//			if (!drop)
+//				trangles.push_back(t);
+//		}
+//				
+//		// 绘制三角形		
+//		for (int i = 0; i < trangles.size(); ++i)
+//		{
+//			auto t = &trangles[i];
+//			RasterizeATrangle(t, pObj->m_pMaterial, pCamera);
+//		}		
+//	}
+//}
+//
+//bool RenderPipeline::CVVCheck(Vertex* pVertex)
+//{
+//	float w = pVertex->position.w;
+//	if (pVertex->position.x < -1.0f || pVertex->position.x > 1.0f)
+//		return false;
+//	if (pVertex->position.y < -1.0f || pVertex->position.y > 1.0f)
+//		return false;
+//	if (pVertex->position.z < -1.0f || pVertex->position.z > 1.0f)
+//		return false;
+//	return true;
+//}
+
+
+
 void RenderPipeline::RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera)
-{
-	std::vector<Trangle> trangles;
-	for (RENDER_LIST::iterator it = pRenderList->begin(); it != pRenderList->end(); ++it)
-	{
-		trangles.clear();
-		RenderObject* pObj = *it;
-		Matrix4x4 m2w = pObj->m_transform.Local2World();		
-		Matrix4x4 mvp = pCamera->GetMatrix_VP() * m2w;
-
-		RenderContext::pM2W = &m2w;
-		RenderContext::pMVP = &mvp;
-
-		auto pFB = pCamera->GetFrameBuffer();
-
-		for (int i = 0; i < pObj->m_pMesh->m_vextexCnt; i += 3)
-		{
-			Trangle t;
-			bool drop = false;
-			for (int j = 0; j < 3; ++j)
-			{
-				// mvp
-				t.v[j] = pObj->m_pMesh->m_pVextexs[i + j];
-				t.v[j].worldPos = m2w.mul(t.v[j].position);	// worldPos
-				//auto v1 = m2w.mul(t.v[j].position);
-				//auto v2 = RenderContext::pView->mul(v1);				
-				//auto v3 = RenderContext::pProj->mul(v2);
-				if (pFB->isFrameBufferAble())
-				{					
-					pObj->m_pMaterial->ApplyVS(&t.v[j]);
-					// 透视除法
-					float reciprocalW = 1.0f / t.v[j].position.w;
-					t.v[j].position = t.v[j].position * reciprocalW;
-					t.v[j].rhw = reciprocalW;
-					t.v[j].worldNormal = m2w.mul(t.v[j].normal);
-				}
-				else
-				{	
-					t.v[j].position = mvp.mul(t.v[j].position);
-					t.v[j].rhw = 1.0f;
-				}
-				//cvv
-				if (!CVVCheck(&t.v[j]))
-				{
-					drop = true;
-					break;
-				}
-				//视口映射
-				t.v[j].position.x = (int)((t.v[j].position.x + 1) * pFB->width() * 0.5f + 0.5f);
-				t.v[j].position.y = (int)((1 - t.v[j].position.y) * pFB->height() * 0.5f + 0.5f);
-				
-			}
-			if (!drop)
-				trangles.push_back(t);
-		}
-				
-		// 绘制三角形		
-		for (int i = 0; i < trangles.size(); ++i)
-		{
-			auto t = &trangles[i];
-			RasterizeATrangle(t, pObj->m_pMaterial, pCamera);
-		}		
-	}
-}
-
-bool RenderPipeline::CVVCheck(Vertex* pVertex)
-{
-	float w = pVertex->position.w;
-	if (pVertex->position.x < -1.0f || pVertex->position.x > 1.0f)
-		return false;
-	if (pVertex->position.y < -1.0f || pVertex->position.y > 1.0f)
-		return false;
-	if (pVertex->position.z < -1.0f || pVertex->position.z > 1.0f)
-		return false;
-	return true;
-}
-
-
-
-void RenderPipeline::RenderAPassWithCVV(RENDER_LIST* pRenderList, Camera* pCamera)
-{
-	const Vector3 NDC_PLANES[6] = 
-	{
-		Vector3(0,0,1,-1),	// n
-		Vector3(0,0,-1,-1),	// f
-		Vector3(0,1,0,-1),	// t
-		Vector3(0,-1,0,-1),	// b
-		Vector3(1,0,0,-1),	// r
-		Vector3(-1,0,0,-1)	// l
-	};
-	// 过点p的 平面方程 A*x+B*y+C*z+D=0, 法向量 N = (a,b,c) d = -(n * p) 
-	// 对应点 Q ,d = N*Q + D ,d < 0 Q在法线负侧 d > 0 Q在法线正侧
-	// 我们约定NDC空间，法线都是沿坐标轴向外的，w存储D值
-
+{	
 	auto pFB = pCamera->GetFrameBuffer();
 	float w = pFB->width();
 	float h = pFB->height();
@@ -172,9 +159,10 @@ void RenderPipeline::RenderAPassWithCVV(RENDER_LIST* pRenderList, Camera* pCamer
 		Matrix4x4 mvp = pCamera->GetMatrix_VP() * m2w;
 		RenderContext::pM2W = &m2w;
 		RenderContext::pMVP = &mvp;
-
+				
 		for (int i = 0; i < pObj->m_pMesh->m_vextexCnt; i += 3)
 		{			
+			Trangle t;
 			inputVertexs.clear();
 			for (int j = 0; j < 3; ++j)
 			{
@@ -194,34 +182,24 @@ void RenderPipeline::RenderAPassWithCVV(RENDER_LIST* pRenderList, Camera* pCamer
 				{
 					v.position = mvp.mul(v.position);
 					v.rhw = 1.0f;
-				}
-				inputVertexs.push_back(v);
+				}				
 				//视口映射
 				v.position.x = (int)((v.position.x + 1) * w * 0.5f + 0.5f);
 				v.position.y = (int)((1 - v.position.y) * h * 0.5f + 0.5f);
+				inputVertexs.push_back(v);
 			}
-			if (IsAllOutNDC(inputVertexs))
+			// check
+			Vector2 ab = inputVertexs[1].position - inputVertexs[0].position;
+			Vector2 bc = inputVertexs[2].position - inputVertexs[1].position;		
+			float areaDouble = Vector2::Cross(ab, bc);	// 只处理逆时针的面
+			if (areaDouble >= 0)
 				continue;
-
-			for (int m = 0; m < 6; ++m)
-			{
-				for (int n = 0; n < 3; ++n)
-				{
-					Vertex& s = inputVertexs[n];
-					Vertex& e = inputVertexs[(n + 1) % 3];
-					if (InsideLine(s.position, NDC_PLANES[i]))
-					{
-						if (!InsideLine(e.position, NDC_PLANES[i]))
-						{
-							Vertex intersect = IntersectNDC(s, e, NDC_PLANES[i]);
-						}
-					}
-					else if (InsideLine(e.position, NDC_PLANES[i]))
-					{ 
-					}
-				}
-			}
-
+			t.v[0] = inputVertexs[0];
+			t.v[1] = inputVertexs[1];
+			t.v[2] = inputVertexs[2];
+			t.areaDouble = areaDouble;
+			t.calcBounds();
+			trangles.push_back(t);
 		}
 
 		// 绘制三角形		
@@ -233,34 +211,6 @@ void RenderPipeline::RenderAPassWithCVV(RENDER_LIST* pRenderList, Camera* pCamer
 	}
 }
 
-bool RenderPipeline::InsideLine(const Vector3& p, const Vector3& line)
-{
-	return line.x * p.x + line.y * p.y + line.z * p.z + line.w * p.w <= 0;
-}
-
-Vertex RenderPipeline::IntersectNDC(const Vertex& s, const Vertex& e, const Vector3& line)
-{
-	// to do 这里需要判断下点是否超出了线段边界
-	float da = s.position.x * line.x + s.position.y * line.y + s.position.z * line.z + line.w * s.position.w;
-	float db = e.position.x * line.x + e.position.y * line.y + e.position.z * line.z + line.w * e.position.w;
-	float weight = da / (da - db);
-	return Vertex::Lerp(s, e, weight);
-}
-
-bool RenderPipeline::IsAllOutNDC(const std::vector<Vertex> &v)
-{
-	for (auto it = v.begin(); it != v.end(); ++it)
-	{
-		const Vertex* pVertex = &(*it);
-		if ((pVertex->position.x >= -1.0f && pVertex->position.x <= 1.0f) && 
-			(pVertex->position.y >= -1.0f && pVertex->position.y <= 1.0f) && 
-			(pVertex->position.z >= -1.0f && pVertex->position.z <= 1.0f)
-			)
-			return false;		
-	}
-	return true;
-}
-
 void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera* pCamera)
 {
 	// 右手坐标系，逆时针	
@@ -268,9 +218,10 @@ void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera
 	Vector2 bc = pTrangle->v[2].position - pTrangle->v[1].position;
 	Vector2 ca = pTrangle->v[0].position - pTrangle->v[2].position;
 
-	float areaTrangle2 = Vector2::Cross(ab, bc);	// 只处理逆时针的面
-	if (areaTrangle2 >= 0)
-		return;
+	float areaTrangle2 = pTrangle->areaDouble;
+	//float areaTrangle2 = Vector2::Cross(ab, bc);	// 只处理逆时针的面
+	//if (areaTrangle2 >= 0)
+	//	return;
 
 	auto pFB = pCamera->GetFrameBuffer();
 	int screenHeight = pFB->height();
@@ -287,26 +238,29 @@ void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera
 		pz2 = 1.0f / pz2;
 	}
 
-	pTrangle->calcBounds();
-	int minX = pTrangle->bounds[0].x;
-	int maxX = pTrangle->bounds[1].x;
-	int minY = pTrangle->bounds[0].y;
-	int maxY = pTrangle->bounds[1].y;
+	//pTrangle->calcBounds();
+	int minX = max(pTrangle->bounds[0].x, 0.0f);
+	int maxX = min(pTrangle->bounds[1].x, screenWidth);
+	int minY = max(pTrangle->bounds[0].y, 0.0f);
+	int maxY = min(pTrangle->bounds[1].y, screenHeight);
 
 	Vertex v;
+	Vector3 p(0, 0, 0);
 	for (int y = minY; y <= maxY && y < screenHeight; ++y)
 	{
 		bool inside = false;
 		for (int x = minX; x <= maxX && x < screenWidth; ++x)
 		{
-			Vector3 p(x, y, 0);
+			p.x = x;
+			p.y = y;
+			p.z = 0;			
 			Vector2 ap = p - pTrangle->v[0].position;
 			Vector2 bp = p - pTrangle->v[1].position;
 			Vector2 cp = p - pTrangle->v[2].position;
 
 			float c1 = Vector2::Cross(ab, ap);
 			float c2 = Vector2::Cross(bc, bp);
-			float c3 = Vector2::Cross(ca, cp);
+			float c3 = Vector2::Cross(ca, cp);			
 			if (/*(c1 >= 0 && c2 >= 0 && c3 >= 0) || */(c1 <= 0 && c2 <= 0 && c3 <= 0))
 			{
 				inside = true;

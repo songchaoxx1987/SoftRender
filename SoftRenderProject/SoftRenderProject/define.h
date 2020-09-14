@@ -22,7 +22,7 @@
 
 #define ENABLE_SHADOWMAP_PCF
 #define ENABLE_ADDPASS
-
+#define ENABLE_TEX_BILINER
 typedef unsigned int UINT32;
 
 

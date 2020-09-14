@@ -31,16 +31,16 @@ void Scene::Init()
 
 
 	pObj = new RenderObject();
-	pObj->Create("Plane", "m03");
+	pObj->Create("Plane", "m03");	
+	pObj->m_transform.position = Vector3(0, -1, 0);
+	pObj->m_transform.scale = Vector3(6, 1, 6);
 	m_renderObjects.push_back(pObj);
-	pObj->m_transform.position = Vector3(0.5, -1, 0);
-	pObj->m_transform.scale *= 6;
 
 	pObj = new RenderObject();
-	pObj->Create("Plane", "grass");	
+	pObj->Create("grass", "grass");	
 	pObj->m_transform.position = Vector3(0, 0, 1.5);
-	pObj->m_transform.scale *= 2;
-	pObj->m_transform.euler = Vector3(90, 0, 0);
+	pObj->m_transform.scale = Vector3(2, 2, 1.0);
+	//pObj->m_transform.euler = Vector3(90, 0, 0);
 	m_renderObjects.push_back(pObj);
 
 	pObj = new RenderObject();
@@ -59,7 +59,7 @@ void Scene::Init()
 	pObj->Create("cat01", "cat01");
 	pObj->m_transform.position = Vector3(1, 0, 2);	
 	pObj->m_transform.euler = Vector3(270, 0, 0);	
-	pObj->m_transform.scale *= 2;
+	pObj->m_transform.scale = Vector3(2.0, 2.0, 2.0);
 	//pObj->enableMove = true;	
 	m_renderObjects.push_back(pObj);
 

@@ -21,7 +21,9 @@ Vertex* VSProgramBase::Method(Vertex* pVertex)
 Vertex* VSWave::Method(Vertex* pVertex)
 {
 	auto pos = pVertex->position;
-	pos.y += 0.1f*sin(2* PI * RenderContext::Time() * pos.x * pos.z);
+	pos.x += 0.1f * pVertex->uv.y * sin(PI * RenderContext::Time());
+	
+	//pos.y += 0.1f*sin(2* PI * RenderContext::Time() * pos.x * pos.z);
 	pVertex->position = RenderContext::pMVP->mul(pos);
 	return pVertex;
 }

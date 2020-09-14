@@ -70,21 +70,6 @@ bool Texture::_loadPNG(const char* file)
 			textureData[x][y].a = (float)image[n++] / 255.0f;
 		}
 	}
-
-	/*textureData = new Color * [w];
-	for (int i = 0; i < w; ++i)
-	{
-		textureData[i] = new Color[h];
-		for (int j = 0 ; j < h ; ++j)
-		{
-			textureData[i][j].r = (float)image[n++]/ 255.0f;
-			textureData[i][j].g = (float)image[n++] /255.0f;
-			textureData[i][j].b = (float)image[n++] / 255.0f;
-			textureData[i][j].a = (float)image[n++] / 255.0f;
-
-		}
-	}*/
-	//UV_STARTS_AT_TOP = true;
 	return true;
 }
 
@@ -119,15 +104,63 @@ void Texture::ClearTexture(Color* pClr)
 
 
 Color Texture::Sample(float u, float v)
-{
+{	
 	u = Clamp<float>(u, 0, 1.0f);
 	v = Clamp<float>(v, 0, 1.0f);
-	//暂时直接采用clamp01的方式采样
-	int intu = (width - 1) * u;
 	if (!UV_STARTS_AT_TOP)
 		v = 1.0f - v;	
-	int intv = (height - 1) * v;
+	float w = (width - 1);
+	float h = (height - 1);
+	int intu = w * u;
+	int intv = h * v;
+
+#ifdef ENABLE_TEX_BILINER
+	int du = min(intu + 1, w);
+	int dv = min(intv + 1, h);
+
+	float fu0 = (float)(intu) / (float)w;
+	float fv0 = (float)(intv) / (float)h;
+	float fu1 = (float)(du) / (float)w;
+	float fv1 = (float)(dv) / (float)h;
+
+	float c0 = (fu1 - fu0);
+	float c1 = (fv1 - fv0);
+	if (c0==0 || c1==0)
+		return textureData[intu][intv];
+
+	float fu = (u - fu0) / c0;
+	float fv = (v - fv0) / c1;
+
+
+	//Color z0 = textureData[intu][intv];
+	//Color z1 = textureData[du][intv];
+	//Color z2 = textureData[intu][dv];
+	//Color z3 = textureData[du][dv];
+
+	//Color a = lerp(z0, z1, fu);
+	//Color b = lerp(z2, z3, fu);
+	//Color c = lerp(a, b, fv);
+
+	float r0 = lerp(textureData[intu][intv].r, textureData[du][intv].r, fu);
+	float g0 = lerp(textureData[intu][intv].g, textureData[du][intv].g, fu);
+	float b0 = lerp(textureData[intu][intv].b, textureData[du][intv].b, fu);
+	float a0 = lerp(textureData[intu][intv].a, textureData[du][intv].a, fu);
+
+	float r1 = lerp(textureData[intu][dv].r, textureData[du][dv].r, fu);
+	float g1 = lerp(textureData[intu][dv].g, textureData[du][dv].g, fu);
+	float b1 = lerp(textureData[intu][dv].b, textureData[du][dv].b, fu);
+	float a1 = lerp(textureData[intu][dv].a, textureData[du][dv].a, fu);
+
+	Color c;
+	c.r = lerp(r0, r1, fv);
+	c.g = lerp(g0, g1, fv);
+	c.b = lerp(b0, b1, fv);
+	c.a = lerp(a0, a1, fv);
+
+	return c;
+#else
 	return textureData[intu][intv];
+#endif	
 }
 
 void Texture::SetPixel(float u, float v, Color& color)

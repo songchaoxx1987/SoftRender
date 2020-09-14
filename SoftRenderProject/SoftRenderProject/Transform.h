@@ -9,7 +9,8 @@ public:
 	~Transform();
 	Vector3 position;
 	Vector3 euler;
-	float scale;
+	Vector3 scale;
+	//float scale;
 		
 	Matrix4x4 Local2World();
 	Matrix4x4 World2Local();

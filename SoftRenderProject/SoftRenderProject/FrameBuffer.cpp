@@ -109,8 +109,8 @@ float FrameBuffer::SampleDepth(float u, float v, bool bilinear)
 		float fx = u - x;
 		float fy = v - y;
 
-		int dy = min(y + 1, m_height);
-		int dx = min(x + 1, m_width);
+		int dy = min(y + 1, m_height - 1);
+		int dx = min(x + 1, m_width - 1);
 
 		float z0 = m_zBuffer[y][x];
 		float z1 = m_zBuffer[y][dx];
