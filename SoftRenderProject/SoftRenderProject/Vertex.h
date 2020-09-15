@@ -16,5 +16,7 @@ public:
 	float rhw;
 
 	static Vertex Lerp(const Vertex& v1, const Vertex& v2, float t);
+
+	void BarycentricLerp(const Vertex& v1, const Vertex& v2, const Vertex& v3, float p1, float p2, float p3);
 };
 

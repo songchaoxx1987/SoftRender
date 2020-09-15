@@ -15,11 +15,14 @@ struct Color;
 class RenderPipeline
 {
 public:
+	RENDER_PATH m_renderPath;
 	void Render(Scene* pScene, CDevice* pDevice, Color* pBGColor);
-protected:
-	//void RenderAPass2(RENDER_LIST* pRenderList, Camera* pCamera);
+protected:	
 	void RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera);
 	void RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera* pCamera);
+
+	void DefferedLightting(Camera* pCamera);
+	//void RenderAPass2(RENDER_LIST* pRenderList, Camera* pCamera);
 	//bool CVVCheck(Vertex* pVertex);	
 };
 

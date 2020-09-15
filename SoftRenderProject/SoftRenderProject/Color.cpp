@@ -65,6 +65,30 @@ Color Color::operator / (const Color& right) const
 	return ret;
 }
 
+void Color::operator += (const Color& right)
+{	
+	r = COLOR_ADD(r, right.r);
+	g = COLOR_ADD(g, right.g);
+	b = COLOR_ADD(b, right.b);
+	a = COLOR_ADD(a, right.a);
+}
+
+void Color::operator *= (const Color& right) 
+{	
+	r = COLOR_MUL(r, right.r);
+	g = COLOR_MUL(g, right.g);
+	b = COLOR_MUL(b, right.b);
+	a = COLOR_MUL(a, right.a);
+}
+
+void Color::operator *= (float value) 
+{	
+	r = COLOR_MUL(r, value);
+	g = COLOR_MUL(g, value);
+	b = COLOR_MUL(b, value);
+	a = COLOR_MUL(a, value);	
+}
+
 UINT32 Color::ToRGB()
 {
 	return ToRGB(r, g, b);

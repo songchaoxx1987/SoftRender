@@ -109,15 +109,22 @@ Color Material::GetTexColor(float u, float v)
 	return pTexture->Sample(u, v);
 }
 
-Color Material::ApplyPS(Vertex* pVex)
+Color Material::ApplyPS(Vertex* pVex, RENDER_PATH renderPath)
 {
 	if (!pShader || !pShader->pPSProgram)
 		return GetTexColor(pVex->uv.x, pVex->uv.y) * color;
-	auto ret = pShader->pPSProgram->Method(pVex, this);
+	Color ret;
+	if (renderPath == RENDER_PATH::forward)
+	{
+		ret = pShader->pPSProgram->ForwardBasePass(pVex, this);
 #ifdef ENABLE_ADDPASS
-	ret = pShader->pPSProgram->AddPass(pVex, this, ret);
+		ret = pShader->pPSProgram->ForwardAddPass(pVex, this, ret);
 #endif // ENABLE_ADDPASS
-
+	}
+	else if (renderPath == RENDER_PATH::defferd)
+	{
+		ret = pShader->pPSProgram->DefferdPass(pVex, this);
+	}	
 	float shadow = 1.0f;
 	if (reciveShadow)
 		shadow = pShader->pPSProgram->AttenShadow(pVex);

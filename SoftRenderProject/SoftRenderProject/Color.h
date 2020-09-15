@@ -30,6 +30,9 @@ public:
 	Color operator - (const Color& right) const;
 	Color operator * (const Color& right) const;
 	Color operator * (float value) const;
+	void operator += (const Color& right);
+	void operator *= (const Color& right);
+	void operator *= (float value);
 	Color operator / (const Color& right) const;
 	Color operator / (float value) const;		
 	UINT32 ToRGB();

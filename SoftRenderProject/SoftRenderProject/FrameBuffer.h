@@ -5,11 +5,11 @@ class CDevice;
 class Vertex;
 class Material;
 
-class GPixel
+class GFragment
 {
 public:
-	GPixel();
-	~GPixel();
+	GFragment();
+	~GFragment();
 	void Reset();
 	Vertex *pVertex;
 	Material* pMaterial;
@@ -50,12 +50,14 @@ public:
 		return isDepthAble() && !isFrameBufferAble();
 	}
 	Texture* GetFrameBuffTex() { return m_pFrameBuffer; }
+
+	GFragment* GetGFragment(int x, int y) { return &(m_pGBuffer[y][x]); }
 protected:
 	float m_width;
 	float m_height;
 
 	Texture* m_pFrameBuffer;
-	GPixel** m_pGBuffer;
+	GFragment** m_pGBuffer;
 	float** m_zBuffer;
 };
 

@@ -4,20 +4,20 @@
 #include "Texture.h"
 #include "CDevice.h"
 
-GPixel::GPixel()
+GFragment::GFragment()
 {
 	pVertex = new Vertex();
 	pMaterial = NULL;
 	usedFlag = false;
 }
 
-GPixel::~GPixel()
+GFragment::~GFragment()
 {
 	SAFE_DELETE(pVertex);
 	pMaterial = NULL;
 }
 
-void GPixel::Reset()
+void GFragment::Reset()
 {	
 	pMaterial = NULL;
 	usedFlag = false;
@@ -39,9 +39,9 @@ void FrameBuffer::Create(int w, int h, int flag)
 	if (CHECK_FLAG(flag, ENUM_FB_MODE::gBuffer))
 	{
 		needFrameBuffer = true;
-		m_pGBuffer = new GPixel * [m_height];
+		m_pGBuffer = new GFragment * [m_height];
 		for (int i = 0; i < m_height; ++i)
-			m_pGBuffer[i] = new GPixel[m_width];
+			m_pGBuffer[i] = new GFragment[m_width];
 	}
 
 	SAFE_RELEASE(m_pFrameBuffer);

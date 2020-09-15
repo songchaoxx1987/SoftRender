@@ -28,8 +28,13 @@ Vertex* VSWave::Method(Vertex* pVertex)
 	return pVertex;
 }
 
-Color PSProgramBase::Method(Vertex* pVertex, Material* pMat)
+Color PSProgramBase::ForwardBasePass(Vertex* pVertex, Material* pMat)
 {	
+	return pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y) * pMat->color;
+}
+
+Color PSProgramBase::DefferdPass(Vertex* pVertex, Material* pMat)
+{
 	return pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y) * pMat->color;
 }
 
@@ -39,8 +44,7 @@ float PSProgramBase::AttenShadow(Vertex* pVertex)
 }
 
 Vertex* VSBlinPhone::Method(Vertex* pVertex)
-{
-	//pVertex->worldPos = RenderContext::pM2W->mul(pVertex->position);	// worldPos
+{	
 	pVertex->position = RenderContext::pMVP->mul(pVertex->position);	
 	return pVertex;
 }
@@ -57,33 +61,59 @@ Color PSBlinPhone::LightFunction(Light* pLight, Vertex* pVex, const Color& diffu
 	}
 	float atten = pLight->Atten(pVex->worldPos);
 	if (atten <= 0.0001f)
-		return Color(0, 0, 0, 0);
+		return Color(0, 0, 0, 1);
 	float dot = Vector3::Dot(pVex->worldNormal, lightDir);
-	Color diffuse = pLight->color * max(0, dot);	// lambert		
+	Color color = pLight->color * max(0, dot);	// lambert diffuse	
 
 	auto viewDir = RenderContext::pMainCamera->Position() - pVex->worldPos;
 	viewDir.Normalize();
 	auto halfDir = viewDir + lightDir;
 	halfDir.Normalize();
-	Color spec = pLight->color * specColor * pow(max(0, Vector3::Dot(pVex->worldNormal, halfDir)), 128.0f * gloss);
-	return (diffuse * diffuseColor) + spec;
+	color *= diffuseColor;
+
+	// spec
+	Color spec = specColor;
+	spec *= pLight->color;
+	spec *= (pow(max(0, Vector3::Dot(pVex->worldNormal, halfDir)), 128.0f * gloss));
+
+	color += spec;
+	
+	return color;
+
+	//Color spec = pLight->color * specColor * pow(max(0, Vector3::Dot(pVex->worldNormal, halfDir)), 128.0f * gloss);
+	//diffuse *= diffuseColor;
+	//return diffuse + spec;
 }
 
-Color PSBlinPhone::Method(Vertex* pVertex, Material* pMat)
+Color PSBlinPhone::ForwardBasePass(Vertex* pVertex, Material* pMat)
 {	
 	Light* pLight = (*RenderContext::m_pLights)[0];
 	Color tex = pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y) * pMat->color;
 	return (*RenderContext::pAmbColor) * tex + LightFunction(pLight, pVertex, tex);
 }
 
-Color PSBlinPhone::AddPass(Vertex* pVertex, Material* pMat, Color& baseColor) 
+Color PSBlinPhone::ForwardAddPass(Vertex* pVertex, Material* pMat, Color& baseColor)
 {
 	Color ret = baseColor;
 	Color tex = pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y) * pMat->color;
 	for (int i = 1; i < RenderContext::m_pLights->size(); ++i)
 	{
 		Light* pLight = (*RenderContext::m_pLights)[i];
-		ret = ret + LightFunction(pLight, pVertex, tex);
+		ret += LightFunction(pLight, pVertex, tex);
+	}
+	return ret;
+}
+
+Color PSBlinPhone::DefferdPass(Vertex* pVertex, Material* pMat)
+{		
+	Color tex = pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y);
+	tex *= pMat->color;
+	Color ret = (*RenderContext::pAmbColor);	// amb
+	ret *= tex;	
+	for (int i = 0; i < RenderContext::m_pLights->size(); ++i)
+	{
+		Light* pLight = (*RenderContext::m_pLights)[i];
+		ret += LightFunction(pLight, pVertex, tex);
 	}
 	return ret;
 }
@@ -100,27 +130,42 @@ Color HalfLambertDiffuse::LightFunction(Light* pLight, Vertex* pVex)
 	}
 	float atten = pLight->Atten(pVex->worldPos);
 	if (atten <= 0.0001f)
-		return Color(0, 0, 0, 0);	
+		return Color(0, 0, 0, 1);	
 	float dot = Vector3::Dot(pVex->worldNormal, lightDir);
-	return pLight->color * (0.5f * dot + 1.0f) * atten;	// half lambert
+	return pLight->color * ((0.5f * dot + 1.0f) * atten);	// half lambert
 }
 
-Color HalfLambertDiffuse::Method(Vertex* pVertex, Material* pMat)
+Color HalfLambertDiffuse::ForwardBasePass(Vertex* pVertex, Material* pMat)
 {	
 	Light* pLight = (*RenderContext::m_pLights)[0];	
 	Color diffuse = LightFunction(pLight, pVertex);
 	return ((*RenderContext::pAmbColor) + diffuse) * pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y) * pMat->color;
 }
 
-Color HalfLambertDiffuse::AddPass(Vertex* pVertex, Material* pMat, Color& baseColor)
+Color HalfLambertDiffuse::ForwardAddPass(Vertex* pVertex, Material* pMat, Color& baseColor)
 {
-	Color add = Color(0,0,0,1);
+	Color add(0,0,0,1);
 	for (int i = 1; i < RenderContext::m_pLights->size(); ++i)
 	{
 		Light* pLight = (*RenderContext::m_pLights)[i];
-		add = add + LightFunction(pLight, pVertex);
+		add += LightFunction(pLight, pVertex);
 	}
-	return baseColor + add * pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y) * pMat->color;
+	add += baseColor;
+	return add * pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y) * pMat->color;
+}
+
+Color HalfLambertDiffuse::DefferdPass(Vertex* pVertex, Material* pMat)
+{	
+	Color col(0, 0, 0, 1); 
+	for (int i = 0; i < RenderContext::m_pLights->size(); ++i)
+	{
+		Light* pLight = (*RenderContext::m_pLights)[i];
+		col += LightFunction(pLight, pVertex);
+	}
+	col += (*RenderContext::pAmbColor);
+	col *= pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y);
+	col *= pMat->color;
+	return col;
 }
 
 ShaderLib::ShaderLib()

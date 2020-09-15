@@ -15,8 +15,6 @@
 #include "Texture.h"
 #include "FrameBuffer.h"
 
-#define LERP(a) (pTrangle->v[0].a * lamda1 + pTrangle->v[1].a * lamda2 + pTrangle->v[2].a * lamda3) * z;
-
 
 void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, Color* pBGColor)
 {	
@@ -58,8 +56,10 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, Color* pBGColor)
 
 	RenderAPass(&geometryList, RenderContext::pShadowMap->GetCamera());
 	RenderAPass(&geometryList, RenderContext::pMainCamera);
+	if (RENDER_PATH::defferd == m_renderPath)
+		DefferedLightting(RenderContext::pMainCamera);
 	RenderAPass(&alphaList, RenderContext::pMainCamera);
-	
+
 	RenderContext::pMainCamera->GetFrameBuffer()->ApplyToDevice(pDevice);
 	pDevice->ApplyToScreen();
 }
@@ -278,25 +278,44 @@ void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera
 						continue;
 					if (pMat->zWrite)
 						pFB->ZWrite(x, y, z);
-				}
-				
-				if (pFB->isFrameBufferAble())				
-				{					
+				}				
+				if (pFB->OnlyDep())
+					continue;
+				if (m_renderPath == RENDER_PATH::forward)
+				{ 
 					v.position = p;
 					v.position.z = z;
-					v.uv = LERP(uv);
-					v.normal = LERP(normal);
-					v.normal.Normalize();
-					v.worldPos = LERP(worldPos);
-					v.worldPos.w = 1.0f;
-					v.worldNormal = LERP(worldNormal);
-					v.worldNormal.Normalize();
-					Color ret = pMat->ApplyPS(&v);
+					v.BarycentricLerp(pTrangle->v[0], pTrangle->v[1], pTrangle->v[2], lamda1, lamda2, lamda3);
+					Color ret = pMat->ApplyPS(&v, RENDER_PATH::forward);
 					if (pMat->isAlphaTest && pMat->alphaClip > ret.a)
 						continue;
-					if (pMat->isAlphaBlend)					
+					if (pMat->isAlphaBlend)
 						AlphaBlendHandler::AlphaBlendFunction(ret, pFB->GetFrameBuffTex()->textureData[x][y], pMat->srcOp, pMat->destOp, ret);
 					pFB->GetFrameBuffTex()->textureData[x][y] = ret;
+				}
+				else if (m_renderPath == RENDER_PATH::defferd)
+				{						
+					if (pMat->isAlphaBlend || pMat->isAlphaTest)
+					{
+						v.position = p;
+						v.position.z = z;
+						v.BarycentricLerp(pTrangle->v[0], pTrangle->v[1], pTrangle->v[2], lamda1, lamda2, lamda3);
+						Color ret = pMat->ApplyPS(&v, RENDER_PATH::forward);
+						if (pMat->isAlphaTest && pMat->alphaClip > ret.a)
+							continue;
+						if (pMat->isAlphaBlend)
+							AlphaBlendHandler::AlphaBlendFunction(ret, pFB->GetFrameBuffTex()->textureData[x][y], pMat->srcOp, pMat->destOp, ret);
+						pFB->GetFrameBuffTex()->textureData[x][y] = ret;
+					}
+					else
+					{
+						auto pFragment = pFB->GetGFragment(x, y);
+						pFragment->pVertex->position = p;
+						pFragment->pVertex->position.z = z;
+						pFragment->pVertex->BarycentricLerp(pTrangle->v[0], pTrangle->v[1], pTrangle->v[2], lamda1, lamda2, lamda3);
+						pFragment->pMaterial = pMat;
+						pFragment->usedFlag = true;
+					}				
 				}				
 			}
 			else
@@ -306,4 +325,22 @@ void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera
 			}
 		}
 	}
+}
+
+void RenderPipeline::DefferedLightting(Camera* pCamera)
+{
+	RenderContext::pMainCamera = pCamera;
+	auto pFB = pCamera->GetFrameBuffer();
+	for (int x = 0; x < pFB->width(); ++x)
+	{
+		for (int y = 0; y < pFB->height(); ++y)
+		{			
+			auto *pFragment = pFB->GetGFragment(x, y);
+			if (!pFragment->usedFlag)
+				continue;
+			Color ret = pFragment->pMaterial->ApplyPS(pFragment->pVertex, RENDER_PATH::defferd);
+			pFB->GetFrameBuffTex()->textureData[x][y] = ret;
+		}
+	}
+	
 }

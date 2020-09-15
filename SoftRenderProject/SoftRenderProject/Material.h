@@ -65,7 +65,7 @@ public:
 	//int cullOp;	// 0 ≤ªºÙ≤√ 1 À≥ ±’Î 2 ƒÊ ±’Î 
 
 	Color GetTexColor(float u, float v);
-	Color ApplyPS(Vertex* pVex);
+	Color ApplyPS(Vertex* pVex, RENDER_PATH renderPath);
 	Vertex* ApplyVS(Vertex* pVex);
 };
 

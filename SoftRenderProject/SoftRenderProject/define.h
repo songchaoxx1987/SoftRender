@@ -23,6 +23,8 @@
 #define ENABLE_SHADOWMAP_PCF
 #define ENABLE_ADDPASS
 #define ENABLE_TEX_BILINER
+#define ENABLE_DEFFERED_LIGHTTING
+
 typedef unsigned int UINT32;
 
 
@@ -32,6 +34,13 @@ enum ENUM_FB_MODE
 	colorBuffer = 1,
 	gBuffer = 2,
 };
+
+enum RENDER_PATH
+{
+	forward = 0,
+	defferd,
+};
+
 
 template <typename  T>
 T Clamp(T a, T min, T max)
