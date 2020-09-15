@@ -94,8 +94,15 @@ UINT32 Color::ToRGB()
 	return ToRGB(r, g, b);
 }
 
+float gama = 0.45f;
 UINT32 Color::ToRGB(float fr, float fg, float fb)
 {
+#ifdef ENABLE_GAMA
+	fr = pow(fr, gama);
+	fg = pow(fg, gama);
+	fb = pow(fb, gama);
+#endif // ENABLE_GAMA
+
 	int R = (int)(fr * 255.0f);
 	int G = (int)(fg * 255.0f);
 	int B = (int)(fb * 255.0f);
