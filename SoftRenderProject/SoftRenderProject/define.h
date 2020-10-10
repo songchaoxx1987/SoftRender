@@ -24,7 +24,7 @@
 #define ENABLE_ADDPASS
 #define ENABLE_TEX_BILINER
 #define ENABLE_DEFFERED_LIGHTTING
-//#define ENABLE_GAMA
+#define ENABLE_GAMA
 
 typedef unsigned int UINT32;
 

@@ -156,7 +156,13 @@ Color Texture::Sample(float u, float v)
 	c.g = lerp(g0, g1, fv);
 	c.b = lerp(b0, b1, fv);
 	c.a = lerp(a0, a1, fv);
-
+	
+#ifdef ENABLE_GAMA
+	float gama = 2.2;
+	c.r = pow(c.r, gama);
+	c.g = pow(c.g, gama);
+	c.b = pow(c.b, gama);
+#endif // ENABLE_GAMA
 	return c;
 #else
 	return textureData[intu][intv];
