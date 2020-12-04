@@ -111,6 +111,9 @@
     <ClInclude Include="Lights.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="CubeMap.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SoftRenderProject.rc">
@@ -199,6 +202,9 @@
       <Filter>3rd</Filter>
     </ClCompile>
     <ClCompile Include="Lights.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeMap.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

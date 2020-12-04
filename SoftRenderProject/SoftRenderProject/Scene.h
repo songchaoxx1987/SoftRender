@@ -18,6 +18,7 @@ public:
 	Camera* m_pMainCamera;		
 	RENDER_LIST m_renderObjects;
 	LIGHT_LIST m_lights;
+	RenderObject* m_pSkyBox;
 	Color ambLight;
 	void Init();
 	void Release();

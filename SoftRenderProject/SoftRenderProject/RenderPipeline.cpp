@@ -191,8 +191,10 @@ void RenderPipeline::RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera)
 			// check
 			Vector2 ab = inputVertexs[1].position - inputVertexs[0].position;
 			Vector2 bc = inputVertexs[2].position - inputVertexs[1].position;		
-			float areaDouble = Vector2::Cross(ab, bc);	// 只处理逆时针的面
-			if (areaDouble >= 0)
+			float areaDouble = Vector2::Cross(ab, bc);			
+			if (areaDouble == 0 ||
+				(areaDouble > 0 && pObj->m_pMaterial->cullOp == CULL_MODE::cull_back) ||
+				(areaDouble < 0 && pObj->m_pMaterial->cullOp == CULL_MODE::cull_front))
 				continue;
 			t.v[0] = inputVertexs[0];
 			t.v[1] = inputVertexs[1];
@@ -261,7 +263,8 @@ void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera
 			float c1 = Vector2::Cross(ab, ap);
 			float c2 = Vector2::Cross(bc, bp);
 			float c3 = Vector2::Cross(ca, cp);			
-			if (/*(c1 >= 0 && c2 >= 0 && c3 >= 0) || */(c1 <= 0 && c2 <= 0 && c3 <= 0))
+			if ((c1 >= 0 && c2 >= 0 && c3 >= 0 && (areaTrangle2 > 0 || pMat->cullOp == CULL_MODE::cull_off)) ||
+				(c1 <= 0 && c2 <= 0 && c3 <= 0 && (areaTrangle2 < 0 || pMat->cullOp == CULL_MODE::cull_off)))
 			{
 				inside = true;
 				float lamda1 = (c2 / areaTrangle2) * pz0;

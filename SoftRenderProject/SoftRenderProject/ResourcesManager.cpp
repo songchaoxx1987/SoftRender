@@ -2,6 +2,7 @@
 #include "ResourcesManager.h"
 #include "CMesh.h"
 #include "Texture.h"
+#include "CubeMap.h"
 #include "Material.h"
 #include "Color.h"
 #include "Shaders.h"
@@ -47,6 +48,27 @@ Texture* ResourcesManager::GetTexture(std::string file)
 	return pTex;
 }
 
+CubeMap* ResourcesManager::GetCubeMap(std::string cubeName)
+{
+	CUBE_MAP::iterator it = m_cubeMap.find(cubeName);
+	if (it != m_cubeMap.end())
+	{
+		it->second->IncreaseRef();
+		return it->second;
+	}
+	CubeMap* pCubeMap = new CubeMap();	
+	char buffer[512];
+	for (int i = 0 ; i < (int)CUBE_MAP_IDX::count ; ++i)
+	{ 
+		sprintf_s(buffer, "cubemap\\%s%s.png",cubeName.c_str(), CubeMap::CubeMapTexPostName[i].c_str());
+		Texture* pTex = GetTexture(buffer);		
+		pCubeMap->m_pTexs[i] = pTex;
+	}
+	pCubeMap->name = cubeName;
+	m_cubeMap[cubeName] = pCubeMap;
+	pCubeMap->IncreaseRef();
+	return pCubeMap;
+}
 
 Material* ResourcesManager::CreateMaterial(std::string matName)
 {
@@ -66,6 +88,8 @@ Material* ResourcesManager::CreateMaterial(std::string matName)
 	Material* pMat = new Material();
 	if (!pCfg->texFile.empty())
 		pMat->pTexture = GetTexture(pCfg->texFile);
+	if (!pCfg->cubeMapName.empty())
+		pMat->pCubeMap = GetCubeMap(pCfg->cubeMapName);
 	pMat->color = pCfg->color;
 	pMat->isAlphaBlend = pCfg->isAlphaBlend;
 	pMat->isAlphaTest = pCfg->isAlphaTest;
@@ -73,8 +97,9 @@ Material* ResourcesManager::CreateMaterial(std::string matName)
 	pMat->zTest = pCfg->zTest;
 	pMat->reciveShadow = pCfg->reciveShadow;
 	pMat->alphaClip = pCfg->alphaClip;
+	pMat->cullOp = pCfg->cullOp;
 	pMat->srcOp = pCfg->srcOp;
-	pMat->destOp = pCfg->destOp;
+	pMat->destOp = pCfg->destOp;	
 	pMat->pShader = ShaderLib::Instance()->GetShader(pCfg->vsProgram, pCfg->psProgram);
 	return pMat;
 }
@@ -112,5 +137,29 @@ void ResourcesManager::ReleaseMaterial(Material* pMat)
 		ReleaseTexture(pMat->pTexture);
 		pMat->pTexture == NULL;
 	}	
+	if (pMat->pCubeMap != NULL)
+	{
+		ReleaseCubeMap(pMat->pCubeMap);
+		pMat->pCubeMap == NULL;
+	}
 	SAFE_DELETE(pMat)
+}
+
+
+void ResourcesManager::ReleaseCubeMap(CubeMap* pCubeMap)
+{
+	if (!pCubeMap)
+		return;
+	if (pCubeMap->DecreaseRef() > 0)
+		return;
+	for (int i = 0; i < (int)CUBE_MAP_IDX::count; ++i)
+	{
+		if (pCubeMap->m_pTexs[i] != NULL)
+			ReleaseTexture(pCubeMap->m_pTexs[i]);
+		pCubeMap->m_pTexs[i] = NULL;
+	}
+	CUBE_MAP::iterator it = m_cubeMap.find(pCubeMap->name);
+	if (it != m_cubeMap.end())
+		m_cubeMap.erase(it);
+	SAFE_DELETE(pCubeMap)
 }

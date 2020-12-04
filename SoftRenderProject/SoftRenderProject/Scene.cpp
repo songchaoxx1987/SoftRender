@@ -21,6 +21,9 @@ void Scene::Init()
 	//m_pMainCamera->m_lookAt = Vector3(0, 0, -4);
 	m_pMainCamera->SetPerspectiveCameraInfo(60, (float)pDevice->screenWidth / (float)pDevice->screenHeight, 0.1f, 1000);
 	//m_pMainCamera->SetOrthoCameraInfo(5, (float)pDevice->screenWidth / (float)pDevice->screenHeight, 0.1f, 1000);
+	m_pSkyBox = new RenderObject();
+	m_pSkyBox->Create("Cube", "skybox");
+	m_pSkyBox->m_transform.position = Vector3(0, 0, 0);
 
 	RenderObject* pObj = NULL;
 	pObj = new RenderObject();	

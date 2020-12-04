@@ -42,6 +42,24 @@ enum RENDER_PATH
 	defferd,
 };
 
+enum CUBE_MAP_IDX
+{
+	front = 0,
+	back = 1,
+	right = 2,
+	left = 3,
+	top = 4,
+	bottom = 5,
+
+	count,
+};
+
+enum CULL_MODE
+{	
+	cull_front = 0,
+	cull_back = 1,
+	cull_off = 2,
+};
 
 template <typename  T>
 T Clamp(T a, T min, T max)

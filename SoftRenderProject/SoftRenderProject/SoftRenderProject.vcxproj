@@ -155,6 +155,7 @@
     <ClInclude Include="CMesh.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="CTimer.h" />
+    <ClInclude Include="CubeMap.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="framework.h" />
@@ -186,6 +187,7 @@
     <ClCompile Include="CMesh.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="CTimer.cpp" />
+    <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="Lights.cpp" />
     <ClCompile Include="main.cpp" />

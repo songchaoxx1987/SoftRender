@@ -25,6 +25,10 @@ bool MaterialConfig::LoadFromFile(std::string file)
 		{
 			texFile = temp[1];
 		}
+		else if (key == "cubeMap") 
+		{
+			cubeMapName = temp[1];
+		}
 		else if (key == "color")
 		{	
 			temp2.clear();
@@ -64,6 +68,10 @@ bool MaterialConfig::LoadFromFile(std::string file)
 		else if (key == "reciveShadow")
 		{
 			reciveShadow = atoi(temp[1].c_str()) > 0;
+		}
+		else if (key == "cull")
+		{
+			cullOp = (CULL_MODE)atoi(temp[1].c_str());
 		}
 		else if (key == "vs")
 		{
