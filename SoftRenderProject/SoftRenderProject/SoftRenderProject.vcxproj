@@ -173,6 +173,7 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shaders.h" />
     <ClInclude Include="ShadowMap.h" />
+    <ClInclude Include="SkyBox.h" />
     <ClInclude Include="SoftRenderProject.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Texture.h" />
@@ -202,6 +203,7 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shaders.cpp" />
     <ClCompile Include="ShadowMap.cpp" />
+    <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Trangle.cpp" />
     <ClCompile Include="Transform.cpp" />
