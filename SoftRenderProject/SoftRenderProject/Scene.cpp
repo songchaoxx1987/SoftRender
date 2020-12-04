@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "RenderObject.h"
 #include "CDevice.h"
+#include "Lights.h"
 
 extern CDevice* pDevice;
 
@@ -12,61 +13,102 @@ void Scene::Init()
 	int fbflag = 0;
 	fbflag = SET_FLAG(fbflag, ENUM_FB_MODE::depth);
 	fbflag = SET_FLAG(fbflag, ENUM_FB_MODE::colorBuffer);	
+	fbflag = SET_FLAG(fbflag, ENUM_FB_MODE::gBuffer);
 	m_pMainCamera->CreateFrameBuffer(pDevice->screenWidth, pDevice->screenHeight, fbflag);
-	m_pMainCamera->SetPosition(Vector3(0, 5, 5));
-	m_pMainCamera->SetLookAt(Vector3(0, 4, 4));
+	m_pMainCamera->SetPosition(Vector3(0, 3, 4));
+	m_pMainCamera->SetLookAt(Vector3(0, 0, 0));
 	//m_pMainCamera->m_position = Vector3(0, 0, 5);
 	//m_pMainCamera->m_lookAt = Vector3(0, 0, -4);
 	m_pMainCamera->SetPerspectiveCameraInfo(60, (float)pDevice->screenWidth / (float)pDevice->screenHeight, 0.1f, 1000);
 	//m_pMainCamera->SetOrthoCameraInfo(5, (float)pDevice->screenWidth / (float)pDevice->screenHeight, 0.1f, 1000);
+	m_pSkyBox = new RenderObject();
+	m_pSkyBox->Create("Cube", "skybox");
+	m_pSkyBox->m_transform.position = Vector3(0, 0, 0);
 
 	RenderObject* pObj = NULL;
 	pObj = new RenderObject();	
 	pObj->Create("Cube", "m02");
 	pObj->enableMove = true;
 	pObj->m_transform.position = Vector3(0, 0, 0);
-	//pObj->m_transform.euler = Vector3(0, 1125.45923, 0);
+	//pObj->m_transform.euler = Vector3(0, 951.32, 0);
 	m_renderObjects.push_back(pObj);
 
 
 	pObj = new RenderObject();
-	pObj->Create("Plane", "m03");
+	pObj->Create("Plane", "m03");	
+	pObj->m_transform.position = Vector3(0, -1, 0);
+	pObj->m_transform.scale = Vector3(6, 1, 6);
 	m_renderObjects.push_back(pObj);
-	pObj->m_transform.position = Vector3(0.5, -1, 0);
-	pObj->m_transform.scale *= 6;
-	//pObj->m_transform.euler = Vector3(0, 0, 0);
 
 	pObj = new RenderObject();
-	pObj->Create("Cube", "m01");
+	pObj->Create("grass", "grass");	
+	pObj->m_transform.position = Vector3(0, 0, 1.5);
+	pObj->m_transform.scale = Vector3(2, 2, 1.0);
+	//pObj->m_transform.euler = Vector3(90, 0, 0);
 	m_renderObjects.push_back(pObj);
+
+	pObj = new RenderObject();
+	pObj->Create("Cube", "blend");	
 	pObj->m_transform.position = Vector3(1.5, 0, 0);
+	m_renderObjects.push_back(pObj);
 	//
 	pObj = new RenderObject();
 	pObj->Create("cow", "cow");
-	pObj->m_transform.position = Vector3(-1.5, 0, 0);
+	pObj->m_transform.position = Vector3(-1.5, 0, 1);
 	pObj->m_transform.euler = Vector3(0, 180, 0);
 	//pObj->enableMove = true;	
 	m_renderObjects.push_back(pObj);
 
 	pObj = new RenderObject();
-	pObj->Create("cow", "cow2");
-	pObj->m_transform.position = Vector3(-1.5, 0, 2);
-	pObj->m_transform.euler = Vector3(0, 180, 0);
+	pObj->Create("cat01", "cat01");
+	pObj->m_transform.position = Vector3(1, 0, 2);	
+	pObj->m_transform.euler = Vector3(270, 0, 0);	
+	pObj->m_transform.scale = Vector3(2.0, 2.0, 2.0);
 	//pObj->enableMove = true;	
 	m_renderObjects.push_back(pObj);
 
-	Light* pLight = new Light();
-	pLight->transform.position = Vector3(0, 0, 0);
-	//pLight->transform.euler = Vector3(0, 180, 0);
+	Light* pLight = NULL;
+	pLight = new Light();
+	pLight->transform.position = Vector3(0, 0, 0);	
 	pLight->transform.euler = Vector3(45, 45, 0);
 	pLight->mode = LightMode::directLight;
-	pLight->color = Color(0.3f, 0.37f, 0.51f);
+	pLight->color = Color(0.37f, 0.3f, 0.51f);
 	pLight->castShadow = true;
 	pLight->CalcDir();
+	m_lights.push_back(pLight);
+		
+	
 
+	pLight = new Light();
+	pLight->mode = LightMode::pointLight;
+	pLight->pointLightRange = 10.0f;
+	pLight->transform.position = Vector3(3, 1, 3);
+	pLight->color = Color(0.04f, 0.69f, 0.90f);	
 	m_lights.push_back(pLight);
 
-	ambLight = Color(0.2f, 0.2f, 0.2f);
+	pLight = new Light();
+	pLight->mode = LightMode::pointLight;
+	pLight->pointLightRange = 10.0f;
+	pLight->transform.position = Vector3(-3, 1, 3);
+	pLight->color = Color(0.991f, 0.80f, 0.04);
+	pLight->intensity = 3;
+	m_lights.push_back(pLight);
+
+	pLight = new Light();
+	pLight->mode = LightMode::pointLight;
+	pLight->pointLightRange = 10.0f;
+	pLight->transform.position = Vector3(-3, 1, -3);
+	pLight->color = Color(0.43f, 1.0f, 0);
+	m_lights.push_back(pLight);
+
+	pLight = new Light();
+	pLight->mode = LightMode::pointLight;
+	pLight->pointLightRange = 10.0f;
+	pLight->transform.position = Vector3(3, 1, -3);
+	pLight->color = Color(0.81f, 0.11f, 0.25);
+	m_lights.push_back(pLight);
+
+	ambLight = Color(0.21f, 0.22f, 0.25f);
 }
 
 void Scene::Release()

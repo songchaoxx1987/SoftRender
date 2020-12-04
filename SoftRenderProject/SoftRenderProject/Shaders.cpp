@@ -5,7 +5,7 @@
 #include "Material.h"
 #include "CTimer.h"
 #include "RenderContext.h"
-#include "Scene.h"
+#include "Lights.h"
 #include "Camera.h"
 #include "ShadowMap.h"
 
@@ -21,14 +21,21 @@ Vertex* VSProgramBase::Method(Vertex* pVertex)
 Vertex* VSWave::Method(Vertex* pVertex)
 {
 	auto pos = pVertex->position;
-	pos.y += 0.1f*sin(2* PI * RenderContext::Time() * pos.x * pos.z);
+	pos.x += 0.1f * pVertex->uv.y * sin(PI * RenderContext::Time());
+	
+	//pos.y += 0.1f*sin(2* PI * RenderContext::Time() * pos.x * pos.z);
 	pVertex->position = RenderContext::pMVP->mul(pos);
 	return pVertex;
 }
 
-Color PSProgramBase::Method(Vertex* pVertex, Material* pMat)
+Color PSProgramBase::ForwardBasePass(Vertex* pVertex, Material* pMat)
 {	
-	return pMat->GetColor(pVertex->uv.x, pVertex->uv.y);
+	return pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y) * pMat->color;
+}
+
+Color PSProgramBase::DefferdPass(Vertex* pVertex, Material* pMat)
+{
+	return pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y) * pMat->color;
 }
 
 float PSProgramBase::AttenShadow(Vertex* pVertex)
@@ -37,31 +44,128 @@ float PSProgramBase::AttenShadow(Vertex* pVertex)
 }
 
 Vertex* VSBlinPhone::Method(Vertex* pVertex)
-{
-	pVertex->worldPos = RenderContext::pM2W->mul(pVertex->position);	// worldPos
-	pVertex->position = RenderContext::pMVP->mul(pVertex->position);
-	pVertex->normal = RenderContext::pM2W->mul(pVertex->normal);	
+{	
+	pVertex->position = RenderContext::pMVP->mul(pVertex->position);	
 	return pVertex;
 }
 
-Color PSBlinPhone::Method(Vertex* pVertex, Material* pMat)
+Color PSBlinPhone::LightFunction(Light* pLight, Vertex* pVex, const Color& diffuseColor)
 {
-	pVertex->normal.Normalize();
-	Light* pLight = (*RenderContext::m_pLights)[0];
-	auto lightDir = pLight->InvDir();
+	Vector3 lightDir;
+	if (pLight->mode == LightMode::directLight)
+		lightDir = pLight->InvDir();
+	else if (pLight->mode == LightMode::pointLight)
+	{
+		lightDir = pLight->transform.position - pVex->worldPos;
+		lightDir.Normalize();
+	}
+	float atten = pLight->Atten(pVex->worldPos);
+	if (atten <= 0.0001f)
+		return Color(0, 0, 0, 1);
+	float dot = Vector3::Dot(pVex->worldNormal, lightDir);
+	Color color = pLight->color * max(0, dot);	// lambert diffuse	
 
-	float dot = Vector3::Dot(pVertex->normal, lightDir);
-	//Color diffuse = pLight->color * max(0, dot);	// lambert
-	Color diffuse = pLight->color * (0.5f * dot + 1.0f);	// half lambert
-	auto viewDir = RenderContext::pMainCamera->Position() - pVertex->worldPos;
+	auto viewDir = RenderContext::pMainCamera->Position() - pVex->worldPos;
 	viewDir.Normalize();
-
 	auto halfDir = viewDir + lightDir;
 	halfDir.Normalize();
+	color *= diffuseColor;
 
-	Color spec = pLight->color * pow(max(0, Vector3::Dot(pVertex->normal, halfDir)), 0.5f);	// 2 gloss
+	// spec
+	Color spec = specColor;
+	spec *= pLight->color;
+	spec *= (pow(max(0, Vector3::Dot(pVex->worldNormal, halfDir)), 128.0f * gloss));
 
-	return ((*RenderContext::pAmbColor) + diffuse + spec) * pMat->GetColor(pVertex->uv.x, pVertex->uv.y);
+	color += spec;
+	
+	return color;
+
+	//Color spec = pLight->color * specColor * pow(max(0, Vector3::Dot(pVex->worldNormal, halfDir)), 128.0f * gloss);
+	//diffuse *= diffuseColor;
+	//return diffuse + spec;
+}
+
+Color PSBlinPhone::ForwardBasePass(Vertex* pVertex, Material* pMat)
+{	
+	Light* pLight = (*RenderContext::m_pLights)[0];
+	Color tex = pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y) * pMat->color;
+	return (*RenderContext::pAmbColor) * tex + LightFunction(pLight, pVertex, tex);
+}
+
+Color PSBlinPhone::ForwardAddPass(Vertex* pVertex, Material* pMat, Color& baseColor)
+{
+	Color ret = baseColor;
+	Color tex = pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y) * pMat->color;
+	for (int i = 1; i < RenderContext::m_pLights->size(); ++i)
+	{
+		Light* pLight = (*RenderContext::m_pLights)[i];
+		ret += LightFunction(pLight, pVertex, tex);
+	}
+	return ret;
+}
+
+Color PSBlinPhone::DefferdPass(Vertex* pVertex, Material* pMat)
+{		
+	Color tex = pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y);
+	tex *= pMat->color;
+	Color ret = (*RenderContext::pAmbColor);	// amb
+	ret *= tex;	
+	for (int i = 0; i < RenderContext::m_pLights->size(); ++i)
+	{
+		Light* pLight = (*RenderContext::m_pLights)[i];
+		ret += LightFunction(pLight, pVertex, tex);
+	}
+	return ret;
+}
+
+Color HalfLambertDiffuse::LightFunction(Light* pLight, Vertex* pVex)
+{
+	Vector3 lightDir;
+	if (pLight->mode == LightMode::directLight)
+		lightDir = pLight->InvDir();
+	else if (pLight->mode == LightMode::pointLight)
+	{
+		lightDir = pLight->transform.position - pVex->worldPos;
+		lightDir.Normalize();
+	}
+	float atten = pLight->Atten(pVex->worldPos);
+	if (atten <= 0.0001f)
+		return Color(0, 0, 0, 1);	
+	float dot = Vector3::Dot(pVex->worldNormal, lightDir);
+	return pLight->color * ((0.5f * dot + 1.0f) * atten);	// half lambert
+}
+
+Color HalfLambertDiffuse::ForwardBasePass(Vertex* pVertex, Material* pMat)
+{	
+	Light* pLight = (*RenderContext::m_pLights)[0];	
+	Color diffuse = LightFunction(pLight, pVertex);
+	return ((*RenderContext::pAmbColor) + diffuse) * pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y) * pMat->color;
+}
+
+Color HalfLambertDiffuse::ForwardAddPass(Vertex* pVertex, Material* pMat, Color& baseColor)
+{
+	Color add(0,0,0,1);
+	for (int i = 1; i < RenderContext::m_pLights->size(); ++i)
+	{
+		Light* pLight = (*RenderContext::m_pLights)[i];
+		add += LightFunction(pLight, pVertex);
+	}
+	add += baseColor;
+	return add * pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y) * pMat->color;
+}
+
+Color HalfLambertDiffuse::DefferdPass(Vertex* pVertex, Material* pMat)
+{	
+	Color col(0, 0, 0, 1); 
+	for (int i = 0; i < RenderContext::m_pLights->size(); ++i)
+	{
+		Light* pLight = (*RenderContext::m_pLights)[i];
+		col += LightFunction(pLight, pVertex);
+	}
+	col += (*RenderContext::pAmbColor);
+	col *= pMat->GetTexColor(pVertex->uv.x, pVertex->uv.y);
+	col *= pMat->color;
+	return col;
 }
 
 ShaderLib::ShaderLib()
@@ -72,6 +176,7 @@ ShaderLib::ShaderLib()
 
 	m_psMap["default"] = new PSProgramBase();
 	m_psMap["blin-phone"] = new PSBlinPhone();
+	m_psMap["diffuse"] = new HalfLambertDiffuse();
 }
 
 Shader* ShaderLib::GetShader(std::string vs, std::string ps)

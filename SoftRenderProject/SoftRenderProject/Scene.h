@@ -4,42 +4,11 @@
 #include "define.h"
 #include <list>
 #include <vector>
-enum LightMode
-{
-	directLight=0,
-	pointLight,
-};
 
-class Light
-{
-public:
-	Transform transform;
-	Color color;
-	LightMode mode;
-	bool castShadow;
-	void CalcDir()
-	{
-		if (mode == LightMode::directLight)
-			_dir = transform.Local2World().mul(Vector3(0, 0, 1, 0));		
-		_dir.Normalize();
-	}
-
-	Vector3 Dir()
-	{
-		return _dir;
-	}
-
-	Vector3 InvDir()
-	{
-		return -_dir;
-	}
-
-private:
-	Vector3 _dir;	
-};
 
 //class RenderObject;
 class Camera;
+class Light;
 
 //typedef std::list<RenderObject*> RENDER_LIST;
 typedef std::vector<Light*> LIGHT_LIST;
@@ -49,6 +18,7 @@ public:
 	Camera* m_pMainCamera;		
 	RENDER_LIST m_renderObjects;
 	LIGHT_LIST m_lights;
+	RenderObject* m_pSkyBox;
 	Color ambLight;
 	void Init();
 	void Release();

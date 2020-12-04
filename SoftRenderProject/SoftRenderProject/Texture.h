@@ -27,5 +27,8 @@ public:
 	void Release();
 
 	void SavePng(std::string file);
+protected:
+	bool _loadBMP(const char* file);
+	bool _loadPNG(const char* file);
 };
 

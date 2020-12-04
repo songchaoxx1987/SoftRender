@@ -150,14 +150,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="3rd\lodepng.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CDevice.h" />
     <ClInclude Include="CMesh.h" />
     <ClInclude Include="Color.h" />
     <ClInclude Include="CTimer.h" />
+    <ClInclude Include="CubeMap.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Lights.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Matrix4x4.h" />
     <ClInclude Include="RenderContext.h" />
@@ -179,12 +182,15 @@
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="3rd\lodepng.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CDevice.cpp" />
     <ClCompile Include="CMesh.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="CTimer.cpp" />
+    <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
+    <ClCompile Include="Lights.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Matrix4x4.cpp" />

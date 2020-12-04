@@ -1,0 +1,9 @@
+tex:grass.png
+color:0,1,0,1
+alphaClip:0.5
+alphaTest:1
+alphaBlend:0
+zWrite:0
+zTest:1
+reciveShadow:0
+vs:wave

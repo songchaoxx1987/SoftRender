@@ -19,13 +19,13 @@ Vector3 Vector3::operator-(const Vector3& right)const
 
 Vector3 Vector3::operator * (float value) const
 {
-	Vector3 ret(x * value, y * value, z * value);
+	Vector3 ret(x * value, y * value, z * value, w);
 	return ret;
 }
 
 Vector3 Vector3::operator / (float value) const
 {
-	Vector3 ret(x / value, y / value, z / value);
+	Vector3 ret(x / value, y / value, z / value, w/value);
 	return ret;
 }
 
@@ -87,6 +87,16 @@ Vector3 Vector3::Max(const Vector3& left, const Vector3& right)
 	ret.y = max(left.y, right.y);
 	ret.z = max(left.z, right.z);
 	return ret;
+}
+
+float Vector3::SqrDistance(const Vector3& left, const Vector3& right)
+{
+	return (right.x - left.x) * (right.x - left.x) + (right.y - left.y) * (right.y - left.y) + (right.z - left.z) * (right.z - left.z);
+}
+
+float Vector3::Distance(const Vector3& left, const Vector3& right)
+{
+	return sqrt(SqrDistance(left, right));
 }
 
 Vector3::operator Vector2()

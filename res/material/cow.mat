@@ -1,4 +1,4 @@
-tex:cow
+tex:cow.png
 color:1,1,1,1
 alphaTest:0
 alphaBlend:0
@@ -6,3 +6,4 @@ zWrite:1
 zTest:1
 vs:blin-phone
 ps:blin-phone
+reciveShadow:1

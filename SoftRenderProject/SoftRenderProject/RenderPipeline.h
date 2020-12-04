@@ -1,6 +1,6 @@
 #pragma once
 #include "define.h"
-
+#include "Vertex.h"
 
 class CDevice;
 class Scene;
@@ -9,17 +9,21 @@ class Material;
 class RenderObject;
 class Trangle;
 class Camera;
-class Vertex;
+//class Vertex;
 struct Color;
 
 class RenderPipeline
 {
 public:
+	RENDER_PATH m_renderPath;
 	void Render(Scene* pScene, CDevice* pDevice, Color* pBGColor);
-protected:
+protected:	
 	void RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera);
 	void RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera* pCamera);
-	bool CVVCheck(Vertex* pVertex);
+
+	void DefferedLightting(Camera* pCamera);
+	//void RenderAPass2(RENDER_LIST* pRenderList, Camera* pCamera);
+	//bool CVVCheck(Vertex* pVertex);	
 };
 
 

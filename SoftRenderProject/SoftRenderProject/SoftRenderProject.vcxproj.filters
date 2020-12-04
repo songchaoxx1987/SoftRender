@@ -105,6 +105,15 @@
     <ClInclude Include="FrameBuffer.h">
       <Filter>game3D</Filter>
     </ClInclude>
+    <ClInclude Include="3rd\lodepng.h">
+      <Filter>3rd</Filter>
+    </ClInclude>
+    <ClInclude Include="Lights.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeMap.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SoftRenderProject.rc">
@@ -188,6 +197,15 @@
     </ClCompile>
     <ClCompile Include="FrameBuffer.cpp">
       <Filter>game3D</Filter>
+    </ClCompile>
+    <ClCompile Include="3rd\lodepng.cpp">
+      <Filter>3rd</Filter>
+    </ClCompile>
+    <ClCompile Include="Lights.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeMap.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

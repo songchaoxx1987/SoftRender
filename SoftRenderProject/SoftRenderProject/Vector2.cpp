@@ -33,6 +33,11 @@ float Vector2::Cross(const Vector2& left, const Vector2& right)
 	return left.x * right.y - right.x * left.y;	
 }
 
+Vector2 Vector2::Lerp(const Vector2& from, const Vector2& to, float t)
+{
+	return to * t + from * (1 - t);
+}
+
 float Vector2::SquareMagnitude()
 {
 	return x*x + y*y;

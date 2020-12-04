@@ -5,7 +5,7 @@
 
 Transform::Transform()
 {
-	scale = 1;
+	scale.x = scale.y = scale.z = 1;
 }
 
 
@@ -17,9 +17,9 @@ Transform::~Transform()
 Matrix4x4 Transform::Local2World()
 {
 	Matrix4x4 s;
-	s.value[0] *= scale;
-	s.value[5] *= scale;
-	s.value[10] *= scale;
+	s.value[0] *= scale.x;
+	s.value[5] *= scale.y;
+	s.value[10] *= scale.z;
 	
 	Matrix4x4 mRot = RotX(euler.x) * RotY(euler.y) * RotZ(euler.z);
 	Matrix4x4 m =  mRot * s;

@@ -65,13 +65,44 @@ Color Color::operator / (const Color& right) const
 	return ret;
 }
 
+void Color::operator += (const Color& right)
+{	
+	r = COLOR_ADD(r, right.r);
+	g = COLOR_ADD(g, right.g);
+	b = COLOR_ADD(b, right.b);
+	a = COLOR_ADD(a, right.a);
+}
+
+void Color::operator *= (const Color& right) 
+{	
+	r = COLOR_MUL(r, right.r);
+	g = COLOR_MUL(g, right.g);
+	b = COLOR_MUL(b, right.b);
+	a = COLOR_MUL(a, right.a);
+}
+
+void Color::operator *= (float value) 
+{	
+	r = COLOR_MUL(r, value);
+	g = COLOR_MUL(g, value);
+	b = COLOR_MUL(b, value);
+	a = COLOR_MUL(a, value);	
+}
+
 UINT32 Color::ToRGB()
 {
 	return ToRGB(r, g, b);
 }
 
+float gama = 0.45f;
 UINT32 Color::ToRGB(float fr, float fg, float fb)
 {
+#ifdef ENABLE_GAMA
+	fr = pow(fr, gama);
+	fg = pow(fg, gama);
+	fb = pow(fb, gama);
+#endif // ENABLE_GAMA
+
 	int R = (int)(fr * 255.0f);
 	int G = (int)(fg * 255.0f);
 	int B = (int)(fb * 255.0f);

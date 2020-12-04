@@ -7,7 +7,7 @@
 class Vertex;
 class Matrix4x4;
 class Material;
-
+class Light;
 
 class VSProgramBase
 {
@@ -30,15 +30,32 @@ public:
 class PSProgramBase
 {
 public:
-	virtual Color Method(Vertex* pVertex, Material* pMat);	
-	float AttenShadow(Vertex* pVertex);
+	virtual Color ForwardBasePass(Vertex* pVertex, Material* pMat);	
+	virtual Color ForwardAddPass(Vertex* pVertex, Material* pMat, Color& baseColor) { return baseColor; }
+	virtual Color DefferdPass(Vertex* pVertex, Material* pMat);
+	float AttenShadow(Vertex* pVertex);	
 };
 
 class PSBlinPhone :public PSProgramBase
 {
 public:
-	virtual Color Method(Vertex* pVertex, Material* pMat);
+	Color specColor = Color(1.0, 1.0, 1.0);
+	float gloss = 1;
+	virtual Color ForwardBasePass(Vertex* pVertex, Material* pMat);
+	virtual Color ForwardAddPass(Vertex* pVertex, Material* pMat, Color& baseColor);
+	virtual Color DefferdPass(Vertex* pVertex, Material* pMat);
 
+	Color LightFunction(Light* pLight, Vertex* pVex, const Color& diffuseColor);
+};
+
+class HalfLambertDiffuse :public PSProgramBase
+{
+public:	
+	virtual Color ForwardBasePass(Vertex* pVertex, Material* pMat);
+	virtual Color ForwardAddPass(Vertex* pVertex, Material* pMat, Color& baseColor);
+	virtual Color DefferdPass(Vertex* pVertex, Material* pMat);
+
+	Color LightFunction(Light* pLight, Vertex* pVex);
 };
 
 class Shader

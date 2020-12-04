@@ -25,6 +25,10 @@ bool MaterialConfig::LoadFromFile(std::string file)
 		{
 			texFile = temp[1];
 		}
+		else if (key == "cubeMap") 
+		{
+			cubeMapName = temp[1];
+		}
 		else if (key == "color")
 		{	
 			temp2.clear();
@@ -36,11 +40,22 @@ bool MaterialConfig::LoadFromFile(std::string file)
 		}
 		else if (key == "alphaTest")
 		{			
-			isAplhaTest = atoi(temp[1].c_str()) > 0;
+			isAlphaTest = atoi(temp[1].c_str()) > 0;
+		}
+		else if (key == "alphaClip")
+		{
+			alphaClip = atof(temp[1].c_str());
 		}
 		else if (key == "alphaBlend")
 		{	
 			isAlphaBlend = atoi(temp[1].c_str()) > 0;
+		}
+		else if (key == "alphaBlendOp")
+		{
+			temp2.clear();
+			split(temp[1], temp2, ',');
+			srcOp = (AlphaBlendOp)atoi(temp2[0].c_str());
+			destOp = (AlphaBlendOp)atoi(temp2[1].c_str());
 		}
 		else if (key == "zWrite")
 		{
@@ -53,6 +68,10 @@ bool MaterialConfig::LoadFromFile(std::string file)
 		else if (key == "reciveShadow")
 		{
 			reciveShadow = atoi(temp[1].c_str()) > 0;
+		}
+		else if (key == "cull")
+		{
+			cullOp = (CULL_MODE)atoi(temp[1].c_str());
 		}
 		else if (key == "vs")
 		{
@@ -77,7 +96,7 @@ Material::Material()
 {
 	pTexture = NULL;
 	color = Color(1.0, 1.0, 1.0);
-	isAplhaTest = false;
+	isAlphaTest = false;
 	isAlphaBlend = false;
 	zWrite = true;
 	zTest = true;
@@ -91,18 +110,29 @@ Material::~Material()
 	pShader = NULL;
 }
 
-Color Material::GetColor(float u, float v)
+Color Material::GetTexColor(float u, float v)
 {
 	if (!pTexture)
 		return Color(1.0f, 1.0f, 1.0f);
-	return (color * pTexture->Sample(u, v));
+	return pTexture->Sample(u, v);
 }
 
-Color Material::ApplyPS(Vertex* pVex)
+Color Material::ApplyPS(Vertex* pVex, RENDER_PATH renderPath)
 {
 	if (!pShader || !pShader->pPSProgram)
-		return GetColor(pVex->uv.x, pVex->uv.y);
-	auto ret = pShader->pPSProgram->Method(pVex, this);
+		return GetTexColor(pVex->uv.x, pVex->uv.y) * color;
+	Color ret;
+	if (renderPath == RENDER_PATH::forward)
+	{
+		ret = pShader->pPSProgram->ForwardBasePass(pVex, this);
+#ifdef ENABLE_ADDPASS
+		ret = pShader->pPSProgram->ForwardAddPass(pVex, this, ret);
+#endif // ENABLE_ADDPASS
+	}
+	else if (renderPath == RENDER_PATH::defferd)
+	{
+		ret = pShader->pPSProgram->DefferdPass(pVex, this);
+	}	
 	float shadow = 1.0f;
 	if (reciveShadow)
 		shadow = pShader->pPSProgram->AttenShadow(pVex);
@@ -114,4 +144,38 @@ Vertex* Material::ApplyVS(Vertex* pVex)
 	if (!pShader || !pShader->pVSProgram)			
 		return pVex;	
 	return pShader->pVSProgram->Method(pVex);
+}
+
+void AlphaBlendHandler::AlphaBlendFunction(Color& src, Color& dest, AlphaBlendOp srcOp, AlphaBlendOp destOp, Color& ret)
+{
+	float p1 = GetAlphaBlendParam(src, dest, srcOp);
+	float p2 = GetAlphaBlendParam(src, dest, destOp);
+	ret = src * p1 + dest * p2;
+}
+
+float AlphaBlendHandler::GetAlphaBlendParam(Color& src, Color& dest, AlphaBlendOp Op)
+{
+	float p1 = 0;
+	switch (Op)
+	{
+	case AlphaBlendOp::zero:
+		p1 = 0;
+		break;
+	case AlphaBlendOp::one:
+		p1 = 1;
+		break;
+	case AlphaBlendOp::src:
+		p1 = src.a;
+		break;
+	case AlphaBlendOp::dest:
+		p1 = dest.a;
+		break;
+	case AlphaBlendOp::oneMinusSrc:
+		p1 = 1 - src.a;
+		break;
+	case AlphaBlendOp::oneMinusDest:
+		p1 = 1 - dest.a;
+		break;
+	}
+	return p1;
 }
