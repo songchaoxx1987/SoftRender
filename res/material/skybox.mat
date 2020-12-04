@@ -5,4 +5,5 @@ alphaBlend:0
 zWrite:1
 zTest:1
 reciveShadow:1
+cull:1
 ps:diffuse

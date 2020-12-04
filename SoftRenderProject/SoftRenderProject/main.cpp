@@ -113,7 +113,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             tick += cost;
             if (tick >= 1000)
             {                
-                printf("FPS:%d\n", fps);
+                printf("FPS:%f \n", (float)fps/((float)tick * 0.001f));
                 fps = 0;
                 tick = 0;
             }

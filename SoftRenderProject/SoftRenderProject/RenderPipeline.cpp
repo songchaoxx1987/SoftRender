@@ -193,8 +193,8 @@ void RenderPipeline::RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera)
 			Vector2 bc = inputVertexs[2].position - inputVertexs[1].position;		
 			float areaDouble = Vector2::Cross(ab, bc);			
 			if (areaDouble == 0 ||
-				(areaDouble > 0 && pObj->m_pMaterial->cullOp == CULL_MODE::cull_back) ||
-				(areaDouble < 0 && pObj->m_pMaterial->cullOp == CULL_MODE::cull_front))
+				(areaDouble > 0 && pObj->m_pMaterial->cullOp == CULL_MODE::cull_front) ||
+				(areaDouble < 0 && pObj->m_pMaterial->cullOp == CULL_MODE::cull_back))
 				continue;
 			t.v[0] = inputVertexs[0];
 			t.v[1] = inputVertexs[1];
