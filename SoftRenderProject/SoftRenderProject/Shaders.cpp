@@ -7,6 +7,7 @@
 #include "RenderContext.h"
 #include "Lights.h"
 #include "Camera.h"
+#include "CubeMap.h"
 #include "ShadowMap.h"
 
 ShaderLib* ShaderLib::_pInstance = NULL;
@@ -25,6 +26,15 @@ Vertex* VSWave::Method(Vertex* pVertex)
 	
 	//pos.y += 0.1f*sin(2* PI * RenderContext::Time() * pos.x * pos.z);
 	pVertex->position = RenderContext::pMVP->mul(pos);
+	return pVertex;
+}
+
+Vertex* VSSkyBox::Method(Vertex* pVertex)
+{
+	pVertex->position = RenderContext::pView->mul(pVertex->position);
+	pVertex->uv.x = pVertex->position.x;
+	pVertex->uv.y = pVertex->position.y;
+	pVertex->uv.z = pVertex->position.z;
 	return pVertex;
 }
 
@@ -168,15 +178,32 @@ Color HalfLambertDiffuse::DefferdPass(Vertex* pVertex, Material* pMat)
 	return col;
 }
 
+Color PSSkyBox::ForwardBasePass(Vertex* pVertex, Material* pMat)
+{
+	return GetRet(pVertex, pMat);
+}
+
+Color PSSkyBox::DefferdPass(Vertex* pVertex, Material* pMat)
+{	
+	return GetRet(pVertex,pMat);
+}
+
+Color PSSkyBox::GetRet(Vertex* pVertex, Material* pMat)
+{
+	return pMat->pCubeMap->Sample(pVertex->position.x, pVertex->position.y, pVertex->position.z) * pMat->color;
+}
+
 ShaderLib::ShaderLib()
 {
 	m_vsMap["default"] = new VSProgramBase();
 	m_vsMap["wave"] = new VSWave();
 	m_vsMap["blin-phone"] = new VSBlinPhone();
+	m_vsMap["skybox"] = new VSSkyBox();
 
 	m_psMap["default"] = new PSProgramBase();
 	m_psMap["blin-phone"] = new PSBlinPhone();
 	m_psMap["diffuse"] = new HalfLambertDiffuse();
+	m_psMap["skybox"] = new PSSkyBox();
 }
 
 Shader* ShaderLib::GetShader(std::string vs, std::string ps)

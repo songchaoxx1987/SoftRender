@@ -27,6 +27,12 @@ public:
 	virtual Vertex* Method(Vertex* pVertex);
 };
 
+class VSSkyBox :public VSProgramBase
+{
+public:
+	virtual Vertex* Method(Vertex* pVertex);
+};
+
 class PSProgramBase
 {
 public:
@@ -56,6 +62,15 @@ public:
 	virtual Color DefferdPass(Vertex* pVertex, Material* pMat);
 
 	Color LightFunction(Light* pLight, Vertex* pVex);
+};
+
+class PSSkyBox :public PSProgramBase
+{
+public:
+	virtual Color ForwardBasePass(Vertex* pVertex, Material* pMat);
+	virtual Color ForwardAddPass(Vertex* pVertex, Material* pMat, Color& baseColor) { return baseColor; }
+	virtual Color DefferdPass(Vertex* pVertex, Material* pMat);
+	Color GetRet(Vertex* pVertex, Material* pMat);
 };
 
 class Shader
