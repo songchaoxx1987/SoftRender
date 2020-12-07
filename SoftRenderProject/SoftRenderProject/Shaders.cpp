@@ -31,10 +31,7 @@ Vertex* VSWave::Method(Vertex* pVertex)
 
 Vertex* VSSkyBox::Method(Vertex* pVertex)
 {
-	pVertex->position = RenderContext::pView->mul(pVertex->position);
-	pVertex->uv.x = pVertex->position.x;
-	pVertex->uv.y = pVertex->position.y;
-	pVertex->uv.z = pVertex->position.z;
+	pVertex->position = RenderContext::pVP->mul(pVertex->position);	
 	return pVertex;
 }
 

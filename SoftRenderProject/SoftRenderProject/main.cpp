@@ -71,11 +71,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     pScene->Init();
 
     RenderPipeline* pPipline = new RenderPipeline();
-#ifdef ENABLE_DEFFERED_LIGHTTING
-    pPipline->m_renderPath = RENDER_PATH::defferd;    
-#else
-    pPipline->m_renderPath = RENDER_PATH::forward;
-#endif
+//#ifdef ENABLE_DEFFERED_LIGHTTING
+//    pPipline->m_renderPath = RENDER_PATH::defferd;    
+//#else
+//    pPipline->m_renderPath = RENDER_PATH::forward;
+//#endif
     MSG msg;
 
     // 主消息循环:

@@ -4,6 +4,7 @@
 #include "RenderObject.h"
 #include "CDevice.h"
 #include "Lights.h"
+#include "material.h"
 
 extern CDevice* pDevice;
 
@@ -24,6 +25,7 @@ void Scene::Init()
 	m_pSkyBox = new RenderObject();
 	m_pSkyBox->Create("Cube", "skybox");
 	m_pSkyBox->m_transform.position = Vector3(0, 0, 0);
+	m_pSkyBox->m_pMaterial->isSkyBox = true;
 
 	RenderObject* pObj = NULL;
 	pObj = new RenderObject();	

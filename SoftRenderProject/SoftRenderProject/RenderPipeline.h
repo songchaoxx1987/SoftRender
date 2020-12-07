@@ -15,11 +15,11 @@ struct Color;
 class RenderPipeline
 {
 public:
-	RENDER_PATH m_renderPath;
+//	RENDER_PATH m_renderPath;
 	void Render(Scene* pScene, CDevice* pDevice, Color* pBGColor);
 protected:	
-	void RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera);
-	void RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera* pCamera);
+	void RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera, RENDER_PATH renderPath);
+	void RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera* pCamera, RENDER_PATH renderPath);
 
 	void DefferedLightting(Camera* pCamera);
 	//void RenderAPass2(RENDER_LIST* pRenderList, Camera* pCamera);

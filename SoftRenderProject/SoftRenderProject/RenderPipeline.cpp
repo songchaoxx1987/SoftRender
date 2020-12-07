@@ -18,6 +18,12 @@
 
 void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, Color* pBGColor)
 {	
+#ifdef ENABLE_DEFFERED_LIGHTTING
+	RENDER_PATH renderPath = RENDER_PATH::defferd;
+#else
+	RENDER_PATH renderPath = RENDER_PATH::forward;	
+#endif
+
 	pScene->m_pMainCamera->BeforeRender();
 	RenderContext::pDevice = pDevice;
 	RenderContext::m_pLights = &(pScene->m_lights);
@@ -53,12 +59,15 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, Color* pBGColor)
 	
 	RenderContext::pMainCamera->GetFrameBuffer()->Clear(pBGColor->r, pBGColor->g, pBGColor->b, pBGColor->a, -MAX_FLAT);
 	RenderContext::pShadowMap->GetCamera()->GetFrameBuffer()->Clear(pBGColor->r, pBGColor->g, pBGColor->b, pBGColor->a, -MAX_FLAT);
+	RENDER_LIST temp;
+	temp.push_back(pScene->m_pSkyBox);
+	RenderAPass(&temp, RenderContext::pMainCamera, RENDER_PATH::forward);
 
-	RenderAPass(&geometryList, RenderContext::pShadowMap->GetCamera());
-	RenderAPass(&geometryList, RenderContext::pMainCamera);
-	if (RENDER_PATH::defferd == m_renderPath)
+	RenderAPass(&geometryList, RenderContext::pShadowMap->GetCamera(), RENDER_PATH::forward);
+	RenderAPass(&geometryList, RenderContext::pMainCamera, renderPath);
+	if (RENDER_PATH::defferd == renderPath)
 		DefferedLightting(RenderContext::pMainCamera);
-	RenderAPass(&alphaList, RenderContext::pMainCamera);
+	RenderAPass(&alphaList, RenderContext::pMainCamera, RENDER_PATH::forward);
 
 	RenderContext::pMainCamera->GetFrameBuffer()->ApplyToDevice(pDevice);
 	pDevice->ApplyToScreen();
@@ -143,7 +152,7 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, Color* pBGColor)
 
 
 
-void RenderPipeline::RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera)
+void RenderPipeline::RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera, RENDER_PATH renderPath)
 {	
 	auto pFB = pCamera->GetFrameBuffer();
 	float w = pFB->width();
@@ -208,12 +217,12 @@ void RenderPipeline::RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera)
 		for (int i = 0; i < trangles.size(); ++i)
 		{
 			auto t = &trangles[i];
-			RasterizeATrangle(t, pObj->m_pMaterial, pCamera);
+			RasterizeATrangle(t, pObj->m_pMaterial, pCamera, renderPath);
 		}
 	}
 }
 
-void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera* pCamera)
+void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera* pCamera, RENDER_PATH renderPath)
 {
 	// 右手坐标系，逆时针	
 	Vector2 ab = pTrangle->v[1].position - pTrangle->v[0].position;
@@ -275,16 +284,22 @@ void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera
 				float z = rhw;
 				if (pCamera->Projection() == CAMERA_PROJECTION_MODE::Perspective)
 					z = 1.0 / z;
+				
 				if (pFB->isDepthAble())
 				{
-					if (pMat->zTest && !pFB->ZTest(x,y,z))
-						continue;
-					if (pMat->zWrite)
-						pFB->ZWrite(x, y, z);
+					if (pMat->isSkyBox)
+						pFB->ZWrite(x, y, -MAX_FLAT);
+					else 
+					{
+						if (pMat->zTest && !pFB->ZTest(x, y, z))
+							continue;
+						if (pMat->zWrite)
+							pFB->ZWrite(x, y, z);
+					}					
 				}				
 				if (pFB->OnlyDep())
 					continue;
-				if (m_renderPath == RENDER_PATH::forward)
+				if (renderPath == RENDER_PATH::forward)
 				{ 
 					v.position = p;
 					v.position.z = z;
@@ -296,9 +311,9 @@ void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera
 						AlphaBlendHandler::AlphaBlendFunction(ret, pFB->GetFrameBuffTex()->textureData[x][y], pMat->srcOp, pMat->destOp, ret);
 					pFB->GetFrameBuffTex()->textureData[x][y] = ret;
 				}
-				else if (m_renderPath == RENDER_PATH::defferd)
+				else if (renderPath == RENDER_PATH::defferd)
 				{						
-					if (pMat->isAlphaBlend || pMat->isAlphaTest)
+					/*if (pMat->isAlphaBlend || pMat->isAlphaTest)
 					{
 						v.position = p;
 						v.position.z = z;
@@ -310,7 +325,7 @@ void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera
 							AlphaBlendHandler::AlphaBlendFunction(ret, pFB->GetFrameBuffTex()->textureData[x][y], pMat->srcOp, pMat->destOp, ret);
 						pFB->GetFrameBuffTex()->textureData[x][y] = ret;
 					}
-					else
+					else*/
 					{
 						auto pFragment = pFB->GetGFragment(x, y);
 						pFragment->pVertex->position = p;

@@ -102,6 +102,7 @@ Material::Material()
 	zTest = true;
 	pShader = NULL;
 	reciveShadow = true;
+	isSkyBox = false;
 }
 
 Material::~Material()
