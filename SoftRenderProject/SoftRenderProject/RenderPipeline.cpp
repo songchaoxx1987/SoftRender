@@ -59,16 +59,20 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, Color* pBGColor)
 	
 	RenderContext::pMainCamera->GetFrameBuffer()->Clear(pBGColor->r, pBGColor->g, pBGColor->b, pBGColor->a, -MAX_FLAT);
 	RenderContext::pShadowMap->GetCamera()->GetFrameBuffer()->Clear(pBGColor->r, pBGColor->g, pBGColor->b, pBGColor->a, -MAX_FLAT);
-	RENDER_LIST temp;
-	temp.push_back(pScene->m_pSkyBox);
-	RenderAPass(&temp, RenderContext::pMainCamera, RENDER_PATH::forward);
+	
 
+	if (pScene->m_pSkyBox != NULL)
+	{
+		RENDER_LIST temp;
+		temp.push_back(pScene->m_pSkyBox);
+		RenderAPass(&temp, RenderContext::pMainCamera, RENDER_PATH::forward);
+	}	
 	RenderAPass(&geometryList, RenderContext::pShadowMap->GetCamera(), RENDER_PATH::forward);
-	RenderAPass(&geometryList, RenderContext::pMainCamera, renderPath);
+	RenderAPass(&geometryList, RenderContext::pMainCamera, renderPath);	
 	if (RENDER_PATH::defferd == renderPath)
 		DefferedLightting(RenderContext::pMainCamera);
 	RenderAPass(&alphaList, RenderContext::pMainCamera, RENDER_PATH::forward);
-
+		
 	RenderContext::pMainCamera->GetFrameBuffer()->ApplyToDevice(pDevice);
 	pDevice->ApplyToScreen();
 }
@@ -287,15 +291,10 @@ void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera
 				
 				if (pFB->isDepthAble())
 				{
-					if (pMat->isSkyBox)
-						pFB->ZWrite(x, y, -MAX_FLAT);
-					else 
-					{
-						if (pMat->zTest && !pFB->ZTest(x, y, z))
-							continue;
-						if (pMat->zWrite)
-							pFB->ZWrite(x, y, z);
-					}					
+					if (pMat->zTest && !pFB->ZTest(x, y, z))
+						continue;
+					if (pMat->zWrite)
+						pFB->ZWrite(x, y, z);									
 				}				
 				if (pFB->OnlyDep())
 					continue;

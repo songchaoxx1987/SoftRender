@@ -22,10 +22,6 @@ void Scene::Init()
 	//m_pMainCamera->m_lookAt = Vector3(0, 0, -4);
 	m_pMainCamera->SetPerspectiveCameraInfo(60, (float)pDevice->screenWidth / (float)pDevice->screenHeight, 0.1f, 1000);
 	//m_pMainCamera->SetOrthoCameraInfo(5, (float)pDevice->screenWidth / (float)pDevice->screenHeight, 0.1f, 1000);
-	m_pSkyBox = new RenderObject();
-	m_pSkyBox->Create("Cube", "skybox");
-	m_pSkyBox->m_transform.position = Vector3(0, 0, 0);
-	m_pSkyBox->m_pMaterial->isSkyBox = true;
 
 	RenderObject* pObj = NULL;
 	pObj = new RenderObject();	
@@ -68,6 +64,11 @@ void Scene::Init()
 	pObj->m_transform.scale = Vector3(2.0, 2.0, 2.0);
 	//pObj->enableMove = true;	
 	m_renderObjects.push_back(pObj);
+
+	pObj = new RenderObject();
+	pObj->Create("Cube", "skybox");
+	pObj->m_transform.position = Vector3(0, 0, 0);
+	//m_pSkyBox = pObj;
 
 	Light* pLight = NULL;
 	pLight = new Light();

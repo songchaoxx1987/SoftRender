@@ -72,7 +72,6 @@ public:
 	Color GetTexColor(float u, float v);
 	Color ApplyPS(Vertex* pVex, RENDER_PATH renderPath);
 	Vertex* ApplyVS(Vertex* pVex);
-	bool isSkyBox;
 };
 
 class AlphaBlendHandler
