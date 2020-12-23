@@ -33,8 +33,10 @@ Vertex* VSSkyBox::Method(Vertex* pVertex)
 {
 	Matrix4x4 v = *RenderContext::pView;
 	v[3] = v[7] = v[11] = 0;
-	Matrix4x4 vp = (*RenderContext::pProj) * v;
-	pVertex->position = vp.mul(pVertex->position);	
+	pVertex->position = v.mul(pVertex->position);	
+	pVertex->position = RenderContext::pProj->mul(pVertex->position);
+	//Matrix4x4 vp = (*RenderContext::pProj) * v;
+	//pVertex->position = vp.mul(pVertex->position);	
 	//pVertex->position.z = -pVertex->position.w;
 	return pVertex;
 }
@@ -191,7 +193,7 @@ Color PSSkyBox::DefferdPass(Vertex* pVertex, Material* pMat)
 
 Color PSSkyBox::GetRet(Vertex* pVertex, Material* pMat)
 {
-	return pMat->pCubeMap->Sample(pVertex->position.x, pVertex->position.y, pVertex->position.z) * pMat->color;
+	return pMat->pCubeMap->Sample(pVertex->worldPos.x, pVertex->worldPos.y, pVertex->worldPos.z) * pMat->color;
 }
 
 ShaderLib::ShaderLib()

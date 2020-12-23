@@ -172,7 +172,7 @@ void RenderPipeline::RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera, REND
 		Matrix4x4 mvp = pCamera->GetMatrix_VP() * m2w;
 		RenderContext::pM2W = &m2w;
 		RenderContext::pMVP = &mvp;
-				
+		bool drop = false;
 		for (int i = 0; i < pObj->m_pMesh->m_vextexCnt; i += 3)
 		{			
 			Trangle t;
@@ -187,6 +187,16 @@ void RenderPipeline::RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera, REND
 
 					pObj->m_pMaterial->ApplyVS(&v);
 					// 透视除法
+
+					// 这里有一个除0的问题，需要做zNear剪裁
+					//float wMax = max(v.position.w, -v.position.w);
+					//float wMin = -wMax;
+					//if (v.position.z <= wMin || v.position.z >= wMax)
+					//{
+					//	drop = true;
+					//	break;
+					//}
+
 					float reciprocalW = 1.0f / v.position.w;
 					v.position = v.position * reciprocalW;
 					v.rhw = reciprocalW;
@@ -202,6 +212,8 @@ void RenderPipeline::RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera, REND
 				inputVertexs.push_back(v);
 			}
 			// check
+			if (drop)			
+				continue;			
 			Vector2 ab = inputVertexs[1].position - inputVertexs[0].position;
 			Vector2 bc = inputVertexs[2].position - inputVertexs[1].position;		
 			float areaDouble = Vector2::Cross(ab, bc);			

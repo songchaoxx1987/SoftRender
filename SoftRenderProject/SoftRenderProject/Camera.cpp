@@ -39,7 +39,6 @@ const Matrix4x4& Camera::GetMatrix_View()
 	m[3] = tx;
 	
 	m[4] = upDir.x;
-
 	m[5] = upDir.y;
 	m[6] = upDir.z;
 	m[7] = ty;
