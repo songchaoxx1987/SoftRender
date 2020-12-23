@@ -27,6 +27,10 @@ void CMesh::LoadFromFile(const char* file)
 	while (getline(stream, line))
 	{	
 		temp.clear();
+		if (line[0] == '*')
+			break;
+		if (line[0] == '#')
+			continue;		
 		split(line, temp, ' ');
 		if (temp.size() == 0)
 			continue;
@@ -67,8 +71,10 @@ void CMesh::LoadFromFile(const char* file)
 				v.clear();
 				split(temp[i],v,'/');				
 				posIdx.push_back(atoi(v[0].c_str()));
-				uvIdx.push_back(atoi(v[1].c_str()));
-				normalIdx.push_back(atoi(v[2].c_str()));
+				if (v.size() > 1)
+					uvIdx.push_back(atoi(v[1].c_str()));
+				if (v.size() > 2)
+					normalIdx.push_back(atoi(v[2].c_str()));
 
 				int idx = posIdx.size() - 1;
 				//printf("%d %d %d\n", posIdx[idx], uvIdx[idx], normalIdx[idx]);
@@ -85,8 +91,10 @@ void CMesh::LoadFromFile(const char* file)
 	for (int i = 0; i < m_vextexCnt; ++i)
 	{
 		m_pVextexs[i].position = positions[posIdx[i] - 1];
-		m_pVextexs[i].normal = normals[normalIdx[i] - 1];
-		m_pVextexs[i].uv = uvs[uvIdx[i] - 1];
+		if (normalIdx.size() > 0)
+			m_pVextexs[i].normal = normals[normalIdx[i] - 1];
+		if (uvIdx.size() > 0)
+			m_pVextexs[i].uv = uvs[uvIdx[i] - 1];
 
 		if (m_pVextexs[i].position.x < bounds[0].x)
 			bounds[0].x = m_pVextexs[i].position.x;

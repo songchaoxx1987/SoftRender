@@ -66,7 +66,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SOFTRENDERPROJECT));
     
-    Color clearColor = Color(0.19,0.3, 0.47f);
+    //Color clearColor = Color(0.19,0.3, 0.47f);
+    Color clearColor = Color(0, 0, 0);
     Scene* pScene = new Scene();
     pScene->Init();
 

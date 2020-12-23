@@ -5,6 +5,6 @@ alphaBlend:0
 zWrite:1
 zTest:1
 reciveShadow:0
-cull:2
+cull:0
 ps:skybox
 vs:skybox
