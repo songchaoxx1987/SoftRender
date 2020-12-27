@@ -22,8 +22,11 @@ protected:
 	void RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera* pCamera, RENDER_PATH renderPath);
 
 	void DefferedLightting(Camera* pCamera);
+	bool IsInSide(int clipPlane, const Vector3& pt);
+	Vertex Intersect(const Vertex* pV1, const Vertex* pV2, const Vector3& plane);
+	void SutherlandHodgeman(std::vector<Vertex>* pInput);
 	//void RenderAPass2(RENDER_LIST* pRenderList, Camera* pCamera);
-	//bool CVVCheck(Vertex* pVertex);	
+	bool CVVCheck(Vertex* pVertex, Camera* pCamera);
 };
 
 

@@ -142,17 +142,8 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, Color* pBGColor)
 //	}
 //}
 //
-//bool RenderPipeline::CVVCheck(Vertex* pVertex)
-//{
-//	float w = pVertex->position.w;
-//	if (pVertex->position.x < -1.0f || pVertex->position.x > 1.0f)
-//		return false;
-//	if (pVertex->position.y < -1.0f || pVertex->position.y > 1.0f)
-//		return false;
-//	if (pVertex->position.z < -1.0f || pVertex->position.z > 1.0f)
-//		return false;
-//	return true;
-//}
+
+
 
 
 
@@ -171,11 +162,10 @@ void RenderPipeline::RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera, REND
 		Matrix4x4 m2w = pObj->m_transform.Local2World();
 		Matrix4x4 mvp = pCamera->GetMatrix_VP() * m2w;
 		RenderContext::pM2W = &m2w;
-		RenderContext::pMVP = &mvp;
-		bool drop = false;
+		RenderContext::pMVP = &mvp;		
 		for (int i = 0; i < pObj->m_pMesh->m_vextexCnt; i += 3)
 		{			
-			Trangle t;
+			//Trangle t;
 			inputVertexs.clear();
 			for (int j = 0; j < 3; ++j)
 			{
@@ -184,49 +174,65 @@ void RenderPipeline::RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera, REND
 				{
 					v.worldPos = m2w.mul(v.position);	// worldPos			
 					v.worldNormal = m2w.mul(v.normal);	// worldNormal
-
 					pObj->m_pMaterial->ApplyVS(&v);
-					// 透视除法
-
-					// 这里有一个除0的问题，需要做zNear剪裁
-					//float wMax = max(v.position.w, -v.position.w);
-					//float wMin = -wMax;
-					//if (v.position.z <= wMin || v.position.z >= wMax)
-					//{
-					//	drop = true;
-					//	break;
-					//}
-
-					float reciprocalW = 1.0f / v.position.w;
-					v.position = v.position * reciprocalW;
-					v.rhw = reciprocalW;
+					
+					//float reciprocalW = 1.0f / v.position.w;
+					//v.position = v.position * reciprocalW;
+					//v.rhw = reciprocalW;
 				}
 				else
 				{
 					v.position = mvp.mul(v.position);
-					v.rhw = 1.0f;
+					v.position.w = 1.0f;
+					//v.rhw = 1.0f;
 				}				
 				//视口映射
-				v.position.x = (int)((v.position.x + 1) * w * 0.5f + 0.5f);
-				v.position.y = (int)((1 - v.position.y) * h * 0.5f + 0.5f);
+				//v.position.x = (int)((v.position.x + 1) * w * 0.5f + 0.5f);
+				//v.position.y = (int)((1 - v.position.y) * h * 0.5f + 0.5f);
 				inputVertexs.push_back(v);
 			}
-			// check
-			if (drop)			
-				continue;			
-			Vector2 ab = inputVertexs[1].position - inputVertexs[0].position;
-			Vector2 bc = inputVertexs[2].position - inputVertexs[1].position;		
-			float areaDouble = Vector2::Cross(ab, bc);			
-			if (areaDouble == 0 ||
-				(areaDouble > 0 && pObj->m_pMaterial->cullOp == CULL_MODE::cull_front) ||
-				(areaDouble < 0 && pObj->m_pMaterial->cullOp == CULL_MODE::cull_back))
-				continue;
-			t.v[0] = inputVertexs[0];
-			t.v[1] = inputVertexs[1];
-			t.v[2] = inputVertexs[2];
-			t.areaDouble = areaDouble;
-			t.calcBounds();
-			trangles.push_back(t);
+					
+	
+			if (!CVVCheck(&inputVertexs[0], pCamera) ||
+				!CVVCheck(&inputVertexs[1], pCamera) ||
+				!CVVCheck(&inputVertexs[2], pCamera))
+			{			
+				SutherlandHodgeman(&inputVertexs);			
+			}
+						
+			for (int i = 0; i < inputVertexs.size(); ++i)
+			{
+				Vertex* p = &inputVertexs[i];
+				p->rhw = 1.0f / p->position.w;
+				p->position = p->position * p->rhw;
+				// 视口映射
+				p->position.x = (int)((p->position.x + 1) * w * 0.5f + 0.5f);
+				p->position.y = (int)((1 - p->position.y) * h * 0.5f + 0.5f);
+			}
+
+			int n = inputVertexs.size() - 3 + 1;
+			int vn = inputVertexs.size();
+			for (int i = 0; i < n; i++) 
+			{				
+				int idx0 = 0;
+				int idx1 = i + 2;
+				int idx2 = i + 1;				
+				// cull
+				Vector2 ab = inputVertexs[idx1].position - inputVertexs[idx0].position;
+				Vector2 bc = inputVertexs[idx2].position - inputVertexs[idx1].position;
+				float areaDouble = Vector2::Cross(ab, bc);
+				if (areaDouble == 0 ||
+					(areaDouble > 0 && pObj->m_pMaterial->cullOp == CULL_MODE::cull_back) ||
+					(areaDouble < 0 && pObj->m_pMaterial->cullOp == CULL_MODE::cull_front))
+					continue;
+				Trangle t;				
+				t.v[0] = inputVertexs[idx0];				
+				t.v[1] = inputVertexs[idx1];				
+				t.v[2] = inputVertexs[idx2];				
+				t.areaDouble = areaDouble;
+				t.calcBounds();
+				trangles.push_back(t);
+			}		
 		}
 
 		// 绘制三角形		
@@ -237,6 +243,83 @@ void RenderPipeline::RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera, REND
 		}
 	}
 }
+
+const Vector3 clip_plane[] = 
+{
+	Vector3(0,0,1,1),
+	Vector3(0,0,-1,1),
+	Vector3(0,1,0,1),
+	Vector3(0,-1,0,1),
+	Vector3(1,0,0,1),
+	Vector3(-1,0,0,1),
+};
+
+bool RenderPipeline::IsInSide(int clipPlane, const Vector3& pt)
+{
+	// beause w < 0
+	return clip_plane[clipPlane].x * pt.x + clip_plane[clipPlane].y * pt.y + clip_plane[clipPlane].z * pt.z + clip_plane[clipPlane].w * pt.w <= 0;
+}
+
+Vertex RenderPipeline::Intersect(const Vertex* pV1, const Vertex* pV2, const Vector3& plane)
+{
+	float da = pV1->position.x * plane.x + pV1->position.y * plane.y + pV1->position.z * plane.z + pV1->position.w * plane.w;
+	float db = pV2->position.x * plane.x + pV2->position.y * plane.y + pV2->position.z * plane.z + pV2->position.w * plane.w;
+
+	float weight = da / (da - db);
+	return Vertex::Lerp(*pV1, *pV2, weight);
+}
+
+bool RenderPipeline::CVVCheck(Vertex* pVertex, Camera *pCamera)
+{
+	float w = pVertex->position.w;
+	if (w >= pCamera->Near() || w <= pCamera->Far())
+		return false;
+	if (pVertex->position.x > -w || pVertex->position.x < w)
+		return false;
+	if (pVertex->position.y > -w || pVertex->position.y < w)
+		return false;
+	if (pVertex->position.z > -w || pVertex->position.z < w)
+		return false;
+	return true;
+}
+
+void RenderPipeline::SutherlandHodgeman(std::vector<Vertex>* pInput)
+{	
+	for (int i = 0; i < 6; ++i)
+	{
+		std::vector<Vertex> input(*pInput);
+		pInput->clear();
+		for (int j = 0; j < input.size(); j++) 
+		{
+			Vertex current = input[j];
+			Vertex last = input[(j + input.size() - 1) % input.size()];
+			if (IsInSide(i, current.position)) 
+			{
+				if (!IsInSide(i, last.position))
+				{
+					Vertex intersecting = Intersect(&last, &current, clip_plane[i]);
+					pInput->push_back(intersecting);
+				}
+				pInput->push_back(current);
+			}
+			else if (IsInSide(i, last.position))
+			{
+				Vertex intersecting = Intersect(&last, &current, clip_plane[i]);
+				pInput->push_back(intersecting);
+			}			
+		}
+		/*
+		printf("plane %d\t %f,%f,%f,%f \n", i, clip_plane[i].x, clip_plane[i].y, clip_plane[i].z, clip_plane[i].w);
+		for (int k = 0; k < pInput->size(); ++k)
+		{
+			printf("idx: %d\t %f,%f,%f,%f\n", k, (*pInput)[k].position.x, (*pInput)[k].position.y, (*pInput)[k].position.z, (*pInput)[k].position.w);
+		}
+		printf("------------------------------------\n");
+		*/
+	}	
+}
+
+
 
 void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera* pCamera, RENDER_PATH renderPath)
 {

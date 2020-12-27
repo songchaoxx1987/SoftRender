@@ -47,6 +47,10 @@ public:
 	}		
 
 	CAMERA_PROJECTION_MODE Projection() { return mode; }
+
+public:
+	float Near() { return -_nearPlane; }
+	float Far() { return -_farPlane; }
 private:
 	Vector3 m_position;
 	Vector3 m_lookAt;

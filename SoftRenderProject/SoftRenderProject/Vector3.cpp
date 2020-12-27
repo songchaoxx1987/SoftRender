@@ -68,7 +68,14 @@ Vector3 Vector3::Cross(const Vector3& left, const Vector3& right)
 
 Vector3 Vector3::Lerp(const Vector3& from, const Vector3& to, float t)
 {
-	return to * t + from * (1 - t);
+	float a = t;
+	float b = 1 - t;
+	Vector3 ret;
+	ret.x = to.x * a + from.x * b;
+	ret.y = to.y * a + from.y * b;
+	ret.z = to.z * a + from.z * b;
+	ret.w = to.w * a + from.w * b;
+	return ret;	
 }
 
 Vector3 Vector3::Min(const Vector3& left, const Vector3& right)

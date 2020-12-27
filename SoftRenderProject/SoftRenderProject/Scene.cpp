@@ -16,7 +16,7 @@ void Scene::Init()
 	fbflag = SET_FLAG(fbflag, ENUM_FB_MODE::colorBuffer);	
 	fbflag = SET_FLAG(fbflag, ENUM_FB_MODE::gBuffer);
 	m_pMainCamera->CreateFrameBuffer(pDevice->screenWidth, pDevice->screenHeight, fbflag);
-	m_pMainCamera->SetPosition(Vector3(0, 3, 4));
+	m_pMainCamera->SetPosition(Vector3(0, 4, 4));
 	//m_pMainCamera->SetPosition(Vector3(0, 0, 4));
 	m_pMainCamera->SetLookAt(Vector3(0, 0, 0));
 	//m_pMainCamera->m_position = Vector3(0, 0, 5);
