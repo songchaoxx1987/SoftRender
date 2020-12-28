@@ -20,6 +20,7 @@
 
 ```json
 tex:cow	贴图
+cubeMap:skybox 环境贴图
 color:1,1,1,1	diffuse color
 alphaTest:0		alphatest开关，1开启，0 关闭。下同
 alphaBlend:0
@@ -29,6 +30,7 @@ alphaClip:0.5	alpha test 裁剪系数
 alphaBlendOp:2,1	alpha blend 混合方式，具体参见material.h中枚举声明
 vs:blin-phone	vertex shader 
 ps:blin-phone	frag shader
+cull:0	背面剔除 0 front 1 back 2 off
 ```
 2 shader定义
 
@@ -39,6 +41,8 @@ ps:blin-phone	frag shader
 ​	res/mesh	mesh目录，目前只支持obj；
 
 ​	res/tex	贴图文件目录，目前支持bmp和png。
+
+​	res/tex/cubemap 环境贴图目录，同一组cubemap使用相同的前缀。
 
 4 场景定义
 
