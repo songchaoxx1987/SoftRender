@@ -60,7 +60,6 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, Color* pBGColor)
 	RenderContext::pMainCamera->GetFrameBuffer()->Clear(pBGColor->r, pBGColor->g, pBGColor->b, pBGColor->a, -MAX_FLAT);
 	RenderContext::pShadowMap->GetCamera()->GetFrameBuffer()->Clear(pBGColor->r, pBGColor->g, pBGColor->b, pBGColor->a, -MAX_FLAT);
 	
-
 	if (pScene->m_pSkyBox != NULL)
 	{
 		RENDER_LIST temp;
@@ -76,76 +75,6 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, Color* pBGColor)
 	RenderContext::pMainCamera->GetFrameBuffer()->ApplyToDevice(pDevice);
 	pDevice->ApplyToScreen();
 }
-
-//void RenderPipeline::RenderAPass2(RENDER_LIST* pRenderList, Camera* pCamera)
-//{
-//	std::vector<Trangle> trangles;
-//	for (RENDER_LIST::iterator it = pRenderList->begin(); it != pRenderList->end(); ++it)
-//	{
-//		trangles.clear();
-//		RenderObject* pObj = *it;
-//		Matrix4x4 m2w = pObj->m_transform.Local2World();		
-//		Matrix4x4 mvp = pCamera->GetMatrix_VP() * m2w;
-//
-//		RenderContext::pM2W = &m2w;
-//		RenderContext::pMVP = &mvp;
-//
-//		auto pFB = pCamera->GetFrameBuffer();
-//
-//		for (int i = 0; i < pObj->m_pMesh->m_vextexCnt; i += 3)
-//		{
-//			Trangle t;
-//			bool drop = false;
-//			for (int j = 0; j < 3; ++j)
-//			{
-//				// mvp
-//				t.v[j] = pObj->m_pMesh->m_pVextexs[i + j];
-//				t.v[j].worldPos = m2w.mul(t.v[j].position);	// worldPos
-//				//auto v1 = m2w.mul(t.v[j].position);
-//				//auto v2 = RenderContext::pView->mul(v1);				
-//				//auto v3 = RenderContext::pProj->mul(v2);
-//				if (pFB->isFrameBufferAble())
-//				{					
-//					pObj->m_pMaterial->ApplyVS(&t.v[j]);
-//					// 透视除法
-//					float reciprocalW = 1.0f / t.v[j].position.w;
-//					t.v[j].position = t.v[j].position * reciprocalW;
-//					t.v[j].rhw = reciprocalW;
-//					t.v[j].worldNormal = m2w.mul(t.v[j].normal);
-//				}
-//				else
-//				{	
-//					t.v[j].position = mvp.mul(t.v[j].position);
-//					t.v[j].rhw = 1.0f;
-//				}
-//				//cvv
-//				if (!CVVCheck(&t.v[j]))
-//				{
-//					drop = true;
-//					break;
-//				}
-//				//视口映射
-//				t.v[j].position.x = (int)((t.v[j].position.x + 1) * pFB->width() * 0.5f + 0.5f);
-//				t.v[j].position.y = (int)((1 - t.v[j].position.y) * pFB->height() * 0.5f + 0.5f);
-//				
-//			}
-//			if (!drop)
-//				trangles.push_back(t);
-//		}
-//				
-//		// 绘制三角形		
-//		for (int i = 0; i < trangles.size(); ++i)
-//		{
-//			auto t = &trangles[i];
-//			RasterizeATrangle(t, pObj->m_pMaterial, pCamera);
-//		}		
-//	}
-//}
-//
-
-
-
-
 
 void RenderPipeline::RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera, RENDER_PATH renderPath)
 {	
@@ -170,35 +99,27 @@ void RenderPipeline::RenderAPass(RENDER_LIST* pRenderList, Camera* pCamera, REND
 			for (int j = 0; j < 3; ++j)
 			{
 				Vertex v = pObj->m_pMesh->m_pVextexs[i + j];
-				if (pFB->isFrameBufferAble())
+				if (pFB->isFrameBufferAble())				
 				{
 					v.worldPos = m2w.mul(v.position);	// worldPos			
 					v.worldNormal = m2w.mul(v.normal);	// worldNormal
-					pObj->m_pMaterial->ApplyVS(&v);
-					
-					//float reciprocalW = 1.0f / v.position.w;
-					//v.position = v.position * reciprocalW;
-					//v.rhw = reciprocalW;
+					pObj->m_pMaterial->ApplyVS(&v);					
 				}
 				else
 				{
-					v.position = mvp.mul(v.position);
-					v.position.w = 1.0f;
-					//v.rhw = 1.0f;
-				}				
-				//视口映射
-				//v.position.x = (int)((v.position.x + 1) * w * 0.5f + 0.5f);
-				//v.position.y = (int)((1 - v.position.y) * h * 0.5f + 0.5f);
+					v.position = mvp.mul(v.position);				
+					v.rhw = 1.0f;
+				}
 				inputVertexs.push_back(v);
-			}
-					
-	
+			}				
+			
 			if (!CVVCheck(&inputVertexs[0], pCamera) ||
 				!CVVCheck(&inputVertexs[1], pCamera) ||
 				!CVVCheck(&inputVertexs[2], pCamera))
-			{			
-				SutherlandHodgeman(&inputVertexs);			
-			}
+			{
+				SutherlandHodgeman(&inputVertexs);
+			}			
+			
 						
 			for (int i = 0; i < inputVertexs.size(); ++i)
 			{
@@ -271,16 +192,29 @@ Vertex RenderPipeline::Intersect(const Vertex* pV1, const Vertex* pV2, const Vec
 
 bool RenderPipeline::CVVCheck(Vertex* pVertex, Camera *pCamera)
 {
-	float w = pVertex->position.w;
-	if (w >= pCamera->Near() || w <= pCamera->Far())
-		return false;
-	if (pVertex->position.x > -w || pVertex->position.x < w)
-		return false;
-	if (pVertex->position.y > -w || pVertex->position.y < w)
-		return false;
-	if (pVertex->position.z > -w || pVertex->position.z < w)
-		return false;
-	return true;
+	if (pCamera->Projection() == CAMERA_PROJECTION_MODE::Perspective)
+	{
+		float w = pVertex->position.w;
+		if (w >= pCamera->Near() || w <= pCamera->Far())
+			return false;
+		if (pVertex->position.x > -w || pVertex->position.x < w)
+			return false;
+		if (pVertex->position.y > -w || pVertex->position.y < w)
+			return false;
+		if (pVertex->position.z > -w || pVertex->position.z < w)
+			return false;
+		return true;
+	}
+	else
+	{
+		if (pVertex->position.x > 1.0 || pVertex->position.x < -1.0)
+			return false;
+		if (pVertex->position.y > 1.0 || pVertex->position.y < -1.0)
+			return false;
+		if (pVertex->position.z > 1.0 || pVertex->position.z < -1.0)
+			return false;
+		return true;
+	}	
 }
 
 void RenderPipeline::SutherlandHodgeman(std::vector<Vertex>* pInput)
