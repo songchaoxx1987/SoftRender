@@ -67,11 +67,11 @@ void RenderPipeline::Render(Scene* pScene, CDevice* pDevice, Color* pBGColor)
 		temp.push_back(pScene->m_pSkyBox);
 		RenderAPass(&temp, RenderContext::pMainCamera, RENDER_PATH::forward);
 	}	
-	//RenderAPass(&geometryList, RenderContext::pShadowMap->GetCamera(), RENDER_PATH::forward);
-	//RenderAPass(&geometryList, RenderContext::pMainCamera, renderPath);	
+	RenderAPass(&geometryList, RenderContext::pShadowMap->GetCamera(), RENDER_PATH::forward);
+	RenderAPass(&geometryList, RenderContext::pMainCamera, renderPath);	
 	if (RENDER_PATH::defferd == renderPath)
 		DefferedLightting(RenderContext::pMainCamera);
-	//RenderAPass(&alphaList, RenderContext::pMainCamera, RENDER_PATH::forward);
+	RenderAPass(&alphaList, RenderContext::pMainCamera, RENDER_PATH::forward);
 		
 	RenderContext::pMainCamera->GetFrameBuffer()->ApplyToDevice(pDevice);
 	pDevice->ApplyToScreen();
