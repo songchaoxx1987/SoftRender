@@ -52,7 +52,7 @@ Color CubeMap::Sample(float x, float y, float z)
 		else
 		{
 			idx = CUBE_MAP_IDX::bottom;
-			u = (u + 1.0) / 2.0;
+			u = (1.0 - u) / 2.0;
 			v = (v + 1.0) / 2.0;
 		}
 	}

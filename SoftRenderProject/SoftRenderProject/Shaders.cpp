@@ -33,10 +33,10 @@ Vertex* VSSkyBox::Method(Vertex* pVertex)
 {
 	Matrix4x4 v = *RenderContext::pView;
 	v[3] = v[7] = v[11] = 0;
-	pVertex->position = v.mul(pVertex->position);	
-	pVertex->position = RenderContext::pProj->mul(pVertex->position);
-	//Matrix4x4 vp = (*RenderContext::pProj) * v;
-	//pVertex->position = vp.mul(pVertex->position);	
+	//pVertex->position = v.mul(pVertex->position);	
+	//pVertex->position = RenderContext::pProj->mul(pVertex->position);
+	Matrix4x4 vp = (*RenderContext::pProj) * v;
+	pVertex->position = vp.mul(pVertex->position);	
 	//pVertex->position.z = -pVertex->position.w;
 	return pVertex;
 }
