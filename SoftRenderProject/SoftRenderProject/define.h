@@ -6,6 +6,7 @@
 #include <list>
 
 //#define CLAMP(a, min, max) a = std::min(std::max(a,min),max);
+#define CLAMP(v,min,max) v > max ? max : (v < min ? min : v)
 #define SAFE_DELETE(p) if(p){delete p; p = NULL;}
 #define SAFE_DELETE2(p, w) if(p){ for (int i = 0 ; i < w; ++i){ delete[] p[i];} delete[] p; p = NULL;}
 #define SAFE_RELEASE(p) if (p){p->Release(); delete p; p=NULL;}

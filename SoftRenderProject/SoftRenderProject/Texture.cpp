@@ -105,8 +105,8 @@ void Texture::ClearTexture(Color* pClr)
 
 Color Texture::Sample(float u, float v)
 {	
-	u = Clamp<float>(u, 0, 1.0f);
-	v = Clamp<float>(v, 0, 1.0f);
+	u = CLAMP(u, 0, 1.0f);
+	v = CLAMP(v, 0, 1.0f);
 	if (!UV_STARTS_AT_TOP)
 		v = 1.0f - v;	
 	float w = (width - 1);

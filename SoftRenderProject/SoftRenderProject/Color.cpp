@@ -1,9 +1,13 @@
 #include "Color.h"
 
+//#define CLAMP(v,min,max) v > max ? max : (v < min ? min : v)
+#define COLOR_ADD(a,b) CLAMP(a + b, 0.0f ,1.0f)
+#define COLOR_MUL(a,b) CLAMP(a * b, 0.0f ,1.0f)
+#define COLOR_DIV(a,b) CLAMP(a / b, 0.0f ,1.0f)
+//#define COLOR_ADD(a,b) Clamp<float>(a + b, 0.0f ,1.0f)
+//#define COLOR_MUL(a,b) Clamp<float>(a * b, 0.0f ,1.0f)
+//#define COLOR_DIV(a,b) Clamp<float>(a / b, 0.0f ,1.0f)
 
-#define COLOR_ADD(a,b) Clamp<float>(a + b, 0.0f ,1.0f)
-#define COLOR_MUL(a,b) Clamp<float>(a * b, 0.0f ,1.0f)
-#define COLOR_DIV(a,b) Clamp<float>(a / b, 0.0f ,1.0f)
 
 Color Color::operator + (const Color& right) const
 {
@@ -106,8 +110,8 @@ UINT32 Color::ToRGB(float fr, float fg, float fb)
 	int R = (int)(fr * 255.0f);
 	int G = (int)(fg * 255.0f);
 	int B = (int)(fb * 255.0f);
-	R = Clamp(R, 0, 255);
-	G = Clamp(G, 0, 255);
-	B = Clamp(B, 0, 255);
+	R = CLAMP(R, 0, 255);
+	G = CLAMP(G, 0, 255);
+	B = CLAMP(B, 0, 255);
 	return (R << 16) | (G << 8) | (B);
 }
