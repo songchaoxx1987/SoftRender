@@ -258,9 +258,14 @@ void RenderPipeline::SutherlandHodgeman(std::vector<Vertex>* pInput)
 void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera* pCamera, RENDER_PATH renderPath)
 {
 	// 右手坐标系，逆时针	
-	Vector2 ab = pTrangle->v[1].position - pTrangle->v[0].position;
+	/*Vector2 ab = pTrangle->v[1].position - pTrangle->v[0].position;
 	Vector2 bc = pTrangle->v[2].position - pTrangle->v[1].position;
-	Vector2 ca = pTrangle->v[0].position - pTrangle->v[2].position;
+	Vector2 ca = pTrangle->v[0].position - pTrangle->v[2].position;*/
+
+	Vector2 ab = Vector3::MinusTo2D(pTrangle->v[1].position, pTrangle->v[0].position);
+	Vector2 bc = Vector3::MinusTo2D(pTrangle->v[2].position, pTrangle->v[1].position);
+	Vector2 ca = Vector3::MinusTo2D(pTrangle->v[0].position, pTrangle->v[2].position);
+
 
 	float areaTrangle2 = pTrangle->areaDouble;
 	//float areaTrangle2 = Vector2::Cross(ab, bc);	// 只处理逆时针的面
@@ -290,6 +295,9 @@ void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera
 
 	Vertex v;
 	Vector3 p(0, 0, 0);
+	Vector2 ap;
+	Vector2 bp;
+	Vector2 cp;
 	for (int y = minY; y <= maxY && y < screenHeight; ++y)
 	{
 		bool inside = false;
@@ -298,13 +306,19 @@ void RenderPipeline::RasterizeATrangle(Trangle* pTrangle, Material* pMat, Camera
 			p.x = x;
 			p.y = y;
 			p.z = 0;			
-			Vector2 ap = p - pTrangle->v[0].position;
-			Vector2 bp = p - pTrangle->v[1].position;
-			Vector2 cp = p - pTrangle->v[2].position;
+			//Vector2 ap = p - pTrangle->v[0].position;
+			//Vector2 bp = p - pTrangle->v[1].position;
+			//Vector2 cp = p - pTrangle->v[2].position;
+			MINUS_TO_2D(p, pTrangle->v[0].position, ap);
+			MINUS_TO_2D(p, pTrangle->v[1].position, bp);
+			MINUS_TO_2D(p, pTrangle->v[2].position, cp);
 
-			float c1 = Vector2::Cross(ab, ap);
-			float c2 = Vector2::Cross(bc, bp);
-			float c3 = Vector2::Cross(ca, cp);			
+			//float c1 = Vector2::Cross(ab, ap);
+			//float c2 = Vector2::Cross(bc, bp);
+			//float c3 = Vector2::Cross(ca, cp);			
+			float c1 = CROSS_V2(ab, ap);
+			float c2 = CROSS_V2(bc, bp);
+			float c3 = CROSS_V2(ca, cp);
 			if ((c1 >= 0 && c2 >= 0 && c3 >= 0 && (areaTrangle2 > 0 || pMat->cullOp == CULL_MODE::cull_off)) ||
 				(c1 <= 0 && c2 <= 0 && c3 <= 0 && (areaTrangle2 < 0 || pMat->cullOp == CULL_MODE::cull_off)))
 			{

@@ -2,8 +2,10 @@
 
 //#define CLAMP(v,min,max) v > max ? max : (v < min ? min : v)
 #define COLOR_ADD(a,b) CLAMP(a + b, 0.0f ,1.0f)
-#define COLOR_MUL(a,b) CLAMP(a * b, 0.0f ,1.0f)
-#define COLOR_DIV(a,b) CLAMP(a / b, 0.0f ,1.0f)
+#define COLOR_MUL(a,b) a * b
+#define COLOR_DIV(a,b) a / b
+//#define COLOR_MUL(a,b) CLAMP(a * b, 0.0f ,1.0f)
+//#define COLOR_DIV(a,b) CLAMP(a / b, 0.0f ,1.0f)
 //#define COLOR_ADD(a,b) Clamp<float>(a + b, 0.0f ,1.0f)
 //#define COLOR_MUL(a,b) Clamp<float>(a * b, 0.0f ,1.0f)
 //#define COLOR_DIV(a,b) Clamp<float>(a / b, 0.0f ,1.0f)

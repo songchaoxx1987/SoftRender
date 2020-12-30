@@ -131,25 +131,30 @@ Color Texture::Sample(float u, float v)
 	float fu = (u - fu0) / c0;
 	float fv = (v - fv0) / c1;
 
+	Color* pC1 = &textureData[intu][intv];
+	Color* pC2 = &textureData[du][intv];
+	Color* pC3 = &textureData[intu][dv];
+	Color* pC4 = &textureData[du][dv];
 
-	//Color z0 = textureData[intu][intv];
-	//Color z1 = textureData[du][intv];
-	//Color z2 = textureData[intu][dv];
-	//Color z3 = textureData[du][dv];
+	float r0 = lerp(pC1->r, pC2->r, fu);
+	float g0 = lerp(pC1->g, pC2->g, fu);
+	float b0 = lerp(pC1->b, pC2->b, fu);
+	float a0 = lerp(pC1->a, pC2->a, fu);
 
-	//Color a = lerp(z0, z1, fu);
-	//Color b = lerp(z2, z3, fu);
-	//Color c = lerp(a, b, fv);
+	float r1 = lerp(pC3->r, pC4->r, fu);
+	float g1 = lerp(pC3->g, pC4->g, fu);
+	float b1 = lerp(pC3->b, pC4->b, fu);
+	float a1 = lerp(pC3->a, pC4->a, fu);
 
-	float r0 = lerp(textureData[intu][intv].r, textureData[du][intv].r, fu);
-	float g0 = lerp(textureData[intu][intv].g, textureData[du][intv].g, fu);
-	float b0 = lerp(textureData[intu][intv].b, textureData[du][intv].b, fu);
-	float a0 = lerp(textureData[intu][intv].a, textureData[du][intv].a, fu);
+	//float r0 = lerp(textureData[intu][intv].r, textureData[du][intv].r, fu);
+	//float g0 = lerp(textureData[intu][intv].g, textureData[du][intv].g, fu);
+	//float b0 = lerp(textureData[intu][intv].b, textureData[du][intv].b, fu);
+	//float a0 = lerp(textureData[intu][intv].a, textureData[du][intv].a, fu);
 
-	float r1 = lerp(textureData[intu][dv].r, textureData[du][dv].r, fu);
-	float g1 = lerp(textureData[intu][dv].g, textureData[du][dv].g, fu);
-	float b1 = lerp(textureData[intu][dv].b, textureData[du][dv].b, fu);
-	float a1 = lerp(textureData[intu][dv].a, textureData[du][dv].a, fu);
+	//float r1 = lerp(textureData[intu][dv].r, textureData[du][dv].r, fu);
+	//float g1 = lerp(textureData[intu][dv].g, textureData[du][dv].g, fu);
+	//float b1 = lerp(textureData[intu][dv].b, textureData[du][dv].b, fu);
+	//float a1 = lerp(textureData[intu][dv].a, textureData[du][dv].a, fu);
 
 	Color c;
 	c.r = lerp(r0, r1, fv);

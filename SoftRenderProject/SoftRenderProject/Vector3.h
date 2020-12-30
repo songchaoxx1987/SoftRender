@@ -44,6 +44,8 @@ public:
 	Vector3 static Lerp(const Vector3& left, const Vector3& right, float t);
 	Vector3 static Min(const Vector3& left, const Vector3& right);
 	Vector3 static Max(const Vector3& left, const Vector3& right);
+	Vector2 static MinusTo2D(const Vector3& left, const Vector3& right);
+	void static MinusTo2D(const Vector3& left, const Vector3& right, Vector2 &ret);
 
 	float static SqrDistance(const Vector3& left, const Vector3& right);
 	float static Distance(const Vector3& left, const Vector3& right);

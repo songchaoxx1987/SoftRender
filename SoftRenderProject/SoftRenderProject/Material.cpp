@@ -132,11 +132,10 @@ Color Material::ApplyPS(Vertex* pVex, RENDER_PATH renderPath)
 	else if (renderPath == RENDER_PATH::defferd)
 	{
 		ret = pShader->pPSProgram->DefferdPass(pVex, this);
-	}	
-	float shadow = 1.0f;
-	if (reciveShadow)
-		shadow = pShader->pPSProgram->AttenShadow(pVex);
-	return ret * shadow;
+	}		
+	if (reciveShadow)	
+		ret *= pShader->pPSProgram->AttenShadow(pVex);	
+	return ret;
 }
 
 Vertex* Material::ApplyVS(Vertex* pVex)

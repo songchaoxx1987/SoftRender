@@ -18,7 +18,9 @@
 #define CHECK_FLAG(flag, p) ((1 << (int)p) & flag) > 0
 #define SET_FLAG(flag, p) flag | (1 << (int)p)
 #define CLEAR_FLAG(flag, p) flag & ~(1 << (int)p) 
+#define CROSS_V2(a,b) a.x * b.y - b.x * a.y
 
+#define MINUS_TO_2D(a,b,ret) ret.x = a.x - b.x;ret.y = a.y - b.y;
 
 
 #define ENABLE_SHADOWMAP_PCF

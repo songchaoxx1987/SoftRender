@@ -112,6 +112,17 @@ Vector3::operator Vector2()
 	return ret;
 }
 
+Vector2 Vector3::MinusTo2D(const Vector3& left, const Vector3& right)
+{
+	return Vector2(left.x - right.x, left.y - right.y);
+}
+
+void Vector3::MinusTo2D(const Vector3& left, const Vector3& right, Vector2& ret)
+{
+	ret.x = left.x - right.x;
+	ret.y = left.y - right.y;
+}
+
 void Vector3::Print()
 {
 	printf("(%f,%f,%f,%f)\n", x, y, z, w);
